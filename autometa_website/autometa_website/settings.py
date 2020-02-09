@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def generate_secret_key(output):
     secret_key = get_random_secret_key()
     with open(output, 'w') as f:
-        f.write(f'SECRET_KEY = {secret_key}')
+        f.write(f'SECRET_KEY = "{secret_key}"')
 
 
 try:
