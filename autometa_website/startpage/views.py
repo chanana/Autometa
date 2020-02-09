@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from .models import Project
+from .models import Job
 
 
 def startpage(request):
-    context = {'project': Project.objects.all()}
+    context = {'job': Job.objects.all()}
     return render(request, 'startpage/home.html', context)
 
 

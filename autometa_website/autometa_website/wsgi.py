@@ -1,5 +1,5 @@
 """
-WSGI config for autometa_website project.
+WSGI config for autometa_website.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
