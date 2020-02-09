@@ -1,5 +1,5 @@
 """
-ASGI config for autometa_website project.
+ASGI config for autometa_website.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
