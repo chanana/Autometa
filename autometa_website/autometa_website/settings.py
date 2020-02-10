@@ -26,11 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def generate_secret_key(output):
     secret_key = get_random_secret_key()
     with open(output, 'w') as f:
-<<<<<<< HEAD
         f.write(f'SECRET_KEY = "{secret_key}"')
-=======
-        f.write(f'removed_secret_key
->>>>>>> f1f26e7cfc414f25bebcd9bd26e3304eb653d9b7
 
 
 try:
