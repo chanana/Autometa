@@ -1,5 +1,6 @@
 {% extends 'startpage/base.html' %}
 {% block content %}
+<h1 class="mb-3">Jobs by {{ view.kwargs.username }} ({{ page_obj.paginator.count }})</h1>
 {% if jobs|length %}
     {% for job in jobs %}
     <article class="media content-section">
@@ -7,15 +8,14 @@
         <div class="media-body">
             <div class="article-metadata">
                 <a class="mr-2" href="{% url 'user-jobs' job.user.username %}">{{ job.user }}</a>
-                <small class="text-muted">{{ job.date_run|date:'F d, Y' }}</small>
                 <h6 class="text-muted">{{ job.get_type_of_job_display }} Job</h6>
+                <small class="text-muted">{{ job.date_run|date:'F d, Y' }}</small>
             </div>
             <h2><a class="article-title" href="{% url 'job-detail' job.id %}">{{ job.title }}</a></h2>
             <p class="article-content">{{ job.description }}</p>
         </div>
     </article>
     {% endfor %}
-    <!--PAGINATION LOGIC-->
     {% if is_paginated %}
 
         {% if page_obj.has_previous %}
@@ -36,5 +36,6 @@
             <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
         {% endif %}
     {% endif %}
+{% else %}
 {% endif %}
 {% endblock content %}

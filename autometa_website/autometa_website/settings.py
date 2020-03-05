@@ -132,8 +132,21 @@ USE_TZ = True
 
 STATIC_URL = local_settings.static_url
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 # # for crispy forms app
 CRISPY_TEMPLATE_PACK = local_settings.crispy_template_pack
 
 # # default redirect url once user logs in
 LOGIN_REDIRECT_URL = local_settings.login_redirect_url
+
+# where to expect login page
+LOGIN_URL = local_settings.login_url
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = local_settings.email_host_user
+EMAIL_HOST_PASSWORD = local_settings.email_host_password
