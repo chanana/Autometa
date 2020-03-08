@@ -1,0 +1,11 @@
+{# autometa_website/startpage/templates/startpage/hometables.html #}
+{% load render_table from django_tables2 %}
+<!doctype html>
+<html>
+    <head>
+        <title>List of jobs</title>
+    </head>
+    <body>
+        {% render_table object_list %}
+    </body>
+</html>

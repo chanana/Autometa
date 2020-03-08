@@ -3,13 +3,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 # even though the user is logged in, what if they just want to modify someone
 # else's job. The mixin below makes sure that the user logged in also owns the
-# job.
+# job they're trying to modify.
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
-
+import django_tables2 as tables
 from .models import Job
 
 # rewrote startpage as a listview. Django has built in class views that
@@ -27,25 +27,23 @@ from .models import Job
 #     return render(request, 'startpage/home.html', context)
 
 
+# class JobTableView(LoginRequiredMixin, tables.Table):
+#     class Meta(Job):
+#         model = Job
+#         template_name = "startpage/hometable.html"
+#         fields = ("name", )
+
+
 class JobListView(LoginRequiredMixin, ListView):
     # LoginRequiredMixin ensures that this view is only visible if the user is
     # logged in. redefined get_queryset method filters the queryset for the
     # current user.
     model = Job
     # expected default format for template is <app>/<model>_<viewtype>.html
-    template_name = "startpage/home.html"
+    template_name = "startpage/hometable.html"
     ordering = ['-date_run']
     context_object_name = 'jobs'
     paginate_by = 5
-
-    # def get_context_data(self, **kwargs):
-    #      # Call the base implementation first to get a context
-    #     context = super().get_context_data(**kwargs)
-    #     # Add in a QuerySet of all the jobs based on current user filter
-    #     if self.request.user.is_authenticated:
-    #         context['jobs'] = Job.objects.filter(
-    #             user=self.request.user).order_by('-date_run')
-    #         return context
 
     def get_queryset(self):
         return super(JobListView, self).get_queryset().filter(user=self.request.user)

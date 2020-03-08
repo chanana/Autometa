@@ -45,6 +45,7 @@ ALLOWED_HOSTS = local_settings.allowed_hosts
 # Application definition
 
 INSTALLED_APPS = [item for item in local_settings.installed_apps] + [
+    'django_tables2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
