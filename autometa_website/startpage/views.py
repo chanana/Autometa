@@ -40,7 +40,7 @@ class JobListView(LoginRequiredMixin, ListView):
     # current user.
     model = Job
     # expected default format for template is <app>/<model>_<viewtype>.html
-    template_name = "startpage/hometable.html"
+    template_name = "startpage/home.html"
     ordering = ['-date_run']
     context_object_name = 'jobs'
     paginate_by = 5
@@ -49,22 +49,23 @@ class JobListView(LoginRequiredMixin, ListView):
         return super(JobListView, self).get_queryset().filter(user=self.request.user)
 
 
-class UserJobListView(LoginRequiredMixin, ListView):
-    # As configured, this allows anyone to type a valid "<username>/jobs" and
-    # view all jobs by that user. This breaks the logic of using JobListView
-    # with a check function
-    model = Job
-    # expected default format for template is <app>/<model>_<viewtype>.html
-    template_name = "startpage/user_jobs.html"
-    context_object_name = 'jobs'
-    paginate_by = 5
+# Have commented this out since home page is the same as user job list page. No one but logged in user can
+# class UserJobListView(LoginRequiredMixin, ListView):
+#     # As configured, this allows anyone to type a valid "<username>/jobs" and
+#     # view all jobs by that user. This breaks the logic of using JobListView
+#     # with a check function
+#     model = Job
+#     # expected default format for template is <app>/<model>_<viewtype>.html
+#     template_name = "startpage/user_jobs.html"
+#     context_object_name = 'jobs'
+#     paginate_by = 5
 
-    def get_queryset(self):
-        # Alternate implementation of this is in JobListView class. I would
-        # argue this is a worse implementation since the order_by happens on the
-        # jobs queryset after retreival from the database.
-        user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Job.objects.filter(user=user).order_by('-date_run')
+#     def get_queryset(self):
+#         # Alternate implementation of this is in JobListView class. I would
+#         # argue this is a worse implementation since the order_by happens on the
+#         # jobs queryset after retreival from the database.
+#         user = get_object_or_404(User, username=self.kwargs.get('username'))
+#         return Job.objects.filter(user=user).order_by('-date_run')
 
 
 class JobDetailView(UserPassesTestMixin, LoginRequiredMixin, DetailView):

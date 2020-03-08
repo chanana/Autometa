@@ -6,13 +6,13 @@ from .views import (
     JobCreateView,
     JobUpdateView,
     JobDeleteView,
-    UserJobListView,
+    # UserJobListView,
 )
 
 urlpatterns = [
     # path('', views.startpage, name='startpage-home'),
     path('', JobListView.as_view(), name='startpage-home'),
-    path('user/<str:username>', UserJobListView.as_view(), name='user-jobs'),
+    # path('user/<str:username>', UserJobListView.as_view(), name='user-jobs'),
     # make a dynamic url pattern. pk is primary key
     path('job/<int:pk>/', JobDetailView.as_view(), name='job-detail'),
     path('job/new/', JobCreateView.as_view(), name='job-create'),

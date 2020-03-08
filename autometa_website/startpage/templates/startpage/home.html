@@ -6,7 +6,6 @@
         <img class="rounded-circle article-img" src="{{ job.user.profile.image.url }}">
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="{% url 'user-jobs' job.user.username %}">{{ job.user }}</a>
                 <small class="text-muted">{{ job.date_run|date:'F d, Y' }}</small>
                 <h6 class="text-muted">{{ job.get_type_of_job_display }} Job</h6>
             </div>
