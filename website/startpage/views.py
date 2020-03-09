@@ -20,7 +20,7 @@ class JobListView(LoginRequiredMixin, ListView):
     model = Job
     # expected default format for template is <app>/<model>_<viewtype>.html
     template_name = "startpage/home.html"
-    ordering = ['-date_run']
+    ordering = ['-date_run', 'type_of_job']
     context_object_name = 'jobs'
     paginate_by = 5
 
