@@ -12,27 +12,6 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
 import django_tables2 as tables
 from .models import Job
 
-# rewrote startpage as a listview. Django has built in class views that
-# attempt to make common page templates easier to render without too much
-# customization
-# def startpage(request):
-#     # whoever requested the startpage, is that user authenticated (logged in)?
-#     if request.user.is_authenticated:
-#         # if yes, then find all jobs by that user and set the context
-#         jobs = Job.objects.filter(user=request.user)
-#         context = {'jobs': jobs}
-#     else:
-#         # if not, then just have an empty context
-#         context = {}
-#     return render(request, 'startpage/home.html', context)
-
-
-# class JobTableView(LoginRequiredMixin, tables.Table):
-#     class Meta(Job):
-#         model = Job
-#         template_name = "startpage/hometable.html"
-#         fields = ("name", )
-
 
 class JobListView(LoginRequiredMixin, ListView):
     # LoginRequiredMixin ensures that this view is only visible if the user is
@@ -47,25 +26,6 @@ class JobListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return super(JobListView, self).get_queryset().filter(user=self.request.user)
-
-
-# Have commented this out since home page is the same as user job list page. No one but logged in user can
-# class UserJobListView(LoginRequiredMixin, ListView):
-#     # As configured, this allows anyone to type a valid "<username>/jobs" and
-#     # view all jobs by that user. This breaks the logic of using JobListView
-#     # with a check function
-#     model = Job
-#     # expected default format for template is <app>/<model>_<viewtype>.html
-#     template_name = "startpage/user_jobs.html"
-#     context_object_name = 'jobs'
-#     paginate_by = 5
-
-#     def get_queryset(self):
-#         # Alternate implementation of this is in JobListView class. I would
-#         # argue this is a worse implementation since the order_by happens on the
-#         # jobs queryset after retreival from the database.
-#         user = get_object_or_404(User, username=self.kwargs.get('username'))
-#         return Job.objects.filter(user=user).order_by('-date_run')
 
 
 class JobDetailView(UserPassesTestMixin, LoginRequiredMixin, DetailView):
