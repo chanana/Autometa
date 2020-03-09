@@ -24,6 +24,9 @@ class JobListView(LoginRequiredMixin, ListView):
     context_object_name = 'jobs'
     paginate_by = 5
 
+    # Why don't we use the test_func and @user_passes_test functionality here?
+    # Answer:
+    # https://stackoverflow.com/questions/55628920/test-func-for-userpassestestmixin-with-get-object-does-not-work-with-listview
     def get_queryset(self):
         return super(JobListView, self).get_queryset().filter(user=self.request.user)
 
