@@ -44,3 +44,22 @@ class Job(models.Model):
         # their new job. Since the job-detail page url is job/<pk>, we need to
         # specify that we get that back as a string in kwargs.
         return reverse('job-detail', kwargs={'pk': self.pk})
+
+
+class BinningJobResult(models.Model):
+    contig = models.TextField()
+    cluster = models.CharField(max_length=150)
+    completeness = models.DecimalField(decimal_places=3, max_digits=6)
+    purity = models.DecimalField(decimal_places=3, max_digits=6)
+    taxid = models.CharField(max_length=150)
+    superkingdom = models.TextField()
+    phylum = models.TextField()
+    class_biology = models.TextField()
+    order = models.TextField()
+    family = models.TextField()
+    genus = models.TextField()
+    species = models.TextField()
+    x = models.DecimalField(decimal_places=2, max_digits=6)
+    y = models.DecimalField(decimal_places=2, max_digits=6)
+
+    job = models.ForeignKey(to=Job, on_delete=models.CASCADE)
