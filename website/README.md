@@ -35,10 +35,6 @@ python manage.py migrate
 # create an admin account
 python manage.py createsuperuser
 
-# save your changes
-python manage.py makemigrations website
-python manage.py migrate
-
 # run the server
 python manage.py runserver
 ```
