@@ -159,6 +159,8 @@ dmypy.json
 .pyre/
 
 ## Autometa specifics
+master.json
+master.tsv
 *log
 *.c
 autometa/*.pyc
