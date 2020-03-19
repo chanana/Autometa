@@ -3,8 +3,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 
-# Create your views here.
-
 
 def register(request):
     # If [if] a form is submitted by a user, i.e. a POST request is received, we take
