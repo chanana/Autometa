@@ -13,6 +13,74 @@ from django.utils.translation import gettext_lazy as _
 # structure using classes but here in django = they are called models.
 
 
+class JobResult(models.Model):
+    title = models.CharField(max_length=100)
+    result = models.FileField(upload_to='results/')
+
+    def __str__(self):
+        return(self.title)
+
+
+class Metagenome(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # check if date is already included
+
+
+class Contig(models.Model):
+    metagenome = models.ForeignKey(Metagenome, on_delete=models.CASCADE)
+
+
+class Markers(models.Model):
+    marker = models.TextField()
+    contig = models.ForeignKey(Contig, on_delete=models.CASCADE)
+
+
+class Coverage(models.Model):
+    coverage = models.FloatField()
+    contig = models.ForeignKey(Contig, on_delete=models.CASCADE)
+
+
+class MajorityVote(models.Model):
+    taxid = models.TextField()
+    superkingdom = models.TextField()
+    phylum = models.TextField()
+    class_biology = models.TextField()
+    order = models.TextField()
+    family = models.TextField()
+    genus = models.TextField()
+    species = models.TextField()
+    contig = models.ForeignKey(Contig, on_delete=models.CASCADE)
+
+
+class Kmers(models.Model):
+    x = models.FloatField()
+    y = models.FloatField()
+    contig = models.ForeignKey(Contig, on_delete=models.CASCADE)
+
+
+class MetagenomeAssembledGenome(models.Model):
+    # bin id is mag id
+    # mag is a bin
+    completeness = models.FloatField()
+    purity = models.FloatField()
+    gc = models.FloatField()
+    coverage = models.FloatField()
+    gdbtk = models.TextField()
+    taxon = models.TextField()
+    contig = models.ForeignKey(Contig, on_delete=models.CASCADE)
+    metagenome = models.ForeignKey(Metagenome, on_delete=models.CASCADE)
+
+
+class Pangenome(models.Model):
+    completeness = models.FloatField()
+    purity = models.FloatField()
+    heterogeneity = models.FloatField()
+    taxon = models.TextField()
+    mag = models.ForeignKey(MetagenomeAssembledGenome,
+                            on_delete=models.CASCADE)
+    metagenome = models.ForeignKey(Metagenome, on_delete=models.CASCADE)
+
+
 class Job(models.Model):
     title = models.CharField(max_length=127)
     date_run = models.DateTimeField(default=timezone.now)
@@ -44,22 +112,3 @@ class Job(models.Model):
         # their new job. Since the job-detail page url is job/<pk>, we need to
         # specify that we get that back as a string in kwargs.
         return reverse('job-detail', kwargs={'pk': self.pk})
-
-
-class BinningJobResult(models.Model):
-    contig = models.TextField()
-    cluster = models.CharField(max_length=150)
-    completeness = models.DecimalField(decimal_places=3, max_digits=6)
-    purity = models.DecimalField(decimal_places=3, max_digits=6)
-    taxid = models.CharField(max_length=150)
-    superkingdom = models.TextField()
-    phylum = models.TextField()
-    class_biology = models.TextField()
-    order = models.TextField()
-    family = models.TextField()
-    genus = models.TextField()
-    species = models.TextField()
-    x = models.DecimalField(decimal_places=2, max_digits=6)
-    y = models.DecimalField(decimal_places=2, max_digits=6)
-
-    job = models.ForeignKey(to=Job, on_delete=models.CASCADE)
