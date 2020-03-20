@@ -1,9 +1,11 @@
 from django import forms
+from .models import UploadedJobResult
 
 
-class SubmitResultsForm(forms.Form):
-    file = forms.FileField(label='Results File',
-                           max_length=150, allow_empty_file=False)
+class SubmitResultsForm(forms.ModelForm):
+    class Meta:
+        model = UploadedJobResult
+        fields = ('title', 'result')
 
 
 class NewJobForm(forms.Form):

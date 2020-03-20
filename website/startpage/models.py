@@ -13,12 +13,13 @@ from django.utils.translation import gettext_lazy as _
 # structure using classes but here in django = they are called models.
 
 
-class JobResult(models.Model):
+class UploadedJobResult(models.Model):
     title = models.CharField(max_length=100)
-    result = models.FileField(upload_to='results/')
+    result = models.FileField(upload_to='uploaded_results/')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return(self.title)
+        return (self.title)
 
 
 class Metagenome(models.Model):

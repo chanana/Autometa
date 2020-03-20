@@ -10,72 +10,30 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView, FormView)
 import django_tables2 as tables
-from .models import Job
+from .models import Job, UploadedJobResult
 from .forms import SubmitResultsForm
 from django.http import HttpResponseRedirect
 from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse_lazy
 
 
-class UploadResultsView(FormView):
-    template_name = 'startpage/upload_result.html'
+class UploadResultsView(CreateView):
+    model = UploadedJobResult
     form_class = SubmitResultsForm
-
-    def post(self, request, *args, **kwargs):
-        """
-        Handle POST requests: instantiate a form instance with the passed
-        POST variables and then check if it's valid.
-        """
-        form = self.get_form()
-        if form.is_valid():
-            uploaded_file = request.FILES['file']
-            fs = FileSystemStorage()
-            name = fs.save(uploaded_file.name, uploaded_file)
-            print(f'filename: {name}')  # debug purposes
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    # came in handy: https://www.youtube.com/watch?v=HSn-e2snNc8 also:
-    # https://github.com/sibtc/django-upload-example/blob/master/mysite/core/views.py
-    # for handling large files maybe? def handle_submitted_file(self, form): f =
-    # form. with open('some/file/name.txt', 'wb+') as destination: for chunk in
-    # f.chunks(): destination.write(chunk)
+    template_name = 'startpage/upload_result.html'
 
     def get_success_url(self):
         messages.add_message(self.request, messages.SUCCESS,
                              'Your file was uploaded successfully!')
         # possible useful answer: https://stackoverflow.com/a/54965061
-        return reverse('startpage-home')
-
-
-class ResultsView(CreateView):
-    pass
-
-    # TODO: make this into a fancy page showing what is happening to the submitted
-    # job or something?
+        return reverse_lazy('startpage-home')
 
 
 class JobInProgressView(CreateView):
+    # TODO: make this into a fancy page showing what is happening to the submitted
+    # job or something?
     template_name = 'startpage/job_in_progress.html'
-
-
-def upload(request):
-    context = {}
-    if request.method == 'POST':
-        uploaded_file = request.FILES['document']
-        fs = FileSystemStorage()
-        # to view the file, use the MEDIA_URL (from settings.py) before the name of the file.
-
-        # if we wanted to show the user the file they uploaded, we can:
-        name = fs.save(uploaded_file.name, uploaded_file)
-        # we could've used the uploaded_file.name but if the user uploads a file
-        # with a name that already exists in the media folder, then we won't get
-        # the right file name
-        url = fs.url(name)
-        context['url'] = url
-    return render(request, 'startpage/upload.html', context=context)
 
 
 class JobListView(LoginRequiredMixin, ListView):
