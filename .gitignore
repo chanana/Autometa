@@ -44,6 +44,7 @@ lib*.pc
 /Debug/
 /Release/
 /tmp_install/
+db/
 
 ## Taken from: https://github.com/github/gitignore/blob/master/Python.gitignore 
 # General
