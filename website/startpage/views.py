@@ -1,21 +1,25 @@
-# in order to only allow new jobs to be created if logged in, we can use
-# decorators on fucntion based views but for class based views, we need mixin
-from django.contrib.auth.mixins import LoginRequiredMixin
-# even though the user is logged in, what if they just want to modify someone
-# else's job. The mixin below makes sure that the user logged in also owns the
-# job they're trying to modify.
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404, render
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView, FormView)
 import django_tables2 as tables
-from .models import Job, UploadedJobResult
-from .forms import SubmitResultsForm
-from django.http import HttpResponseRedirect
-from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
+from django.views.generic import (CreateView, DeleteView, DetailView, FormView,
+                                  ListView, UpdateView)
+from .forms import SubmitResultsForm
+from .models import Job, UploadedJobResult
+
+
+class VisualizeResultsView(CreateView, LoginRequiredMixin):
+    model = UploadedJobResult
+    template_name = 'startpage/visualize.html'
+    context_object_name = 'results'
+    fields = ('title', 'result', 'user')
+
+    def get_queryset(self):
+        return super(VisualizeResultsView, self).get_queryset().filter(user=self.request.user)
 
 
 class UploadResultsView(CreateView):

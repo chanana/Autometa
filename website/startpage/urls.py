@@ -8,10 +8,12 @@ from .views import (
     JobDeleteView,
     UploadResultsView,
     JobInProgressView,
+    VisualizeResultsView,
     # UserJobListView,
 )
 
 urlpatterns = [
+    path('visualize/', VisualizeResultsView.as_view(), name='visualize'),
     path('upload/', UploadResultsView.as_view(), name='upload'),
     # path('', views.startpage, name='startpage-home'),
     path('', JobListView.as_view(), name='startpage-home'),
