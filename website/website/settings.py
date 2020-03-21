@@ -45,7 +45,6 @@ ALLOWED_HOSTS = local_settings.allowed_hosts
 # Application definition
 
 INSTALLED_APPS = [item for item in local_settings.installed_apps] + [
-    'django_tables2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -91,7 +90,11 @@ WSGI_APPLICATION = 'website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': local_settings.database_engine,
-        'NAME': os.path.join(BASE_DIR, local_settings.database_name),
+        'NAME': local_settings.database_name,
+        'USER': local_settings.database_user,
+        'PASS': local_settings.database_password,
+        'HOST': local_settings.database_host,
+        'PORT': local_settings.database_port
     }
 }
 
@@ -146,8 +149,8 @@ LOGIN_REDIRECT_URL = local_settings.login_redirect_url
 LOGIN_URL = local_settings.login_url
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = local_settings.email_host
+EMAIL_PORT = local_settings.email_port
+EMAIL_USE_TLS = local_settings.email_use_TLS
 EMAIL_HOST_USER = local_settings.email_host_user
 EMAIL_HOST_PASSWORD = local_settings.email_host_password
