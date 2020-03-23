@@ -5,6 +5,8 @@ urlpatterns = [
     path('upload/', views.UploadView.as_view(), name='upload'),
     path('upload_list/', views.UploadListView.as_view(), name='upload_list'),
     path('upload_list/<int:pk>/', views.delete_file, name='delete_file'),
+    path('upload_list/<int:pk>/visualize',
+         views.UploadDetailView.as_view(), name='visualize'),
     # path('upload/', views.uploadResults, name='upload'),
     # path('visualize/', VisualizeResultsView.as_view(), name='visualize'),
     # path('', views.startpage, name='startpage-home'),

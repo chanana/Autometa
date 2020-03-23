@@ -16,7 +16,15 @@ from .forms import UploadsForm
 from .models import Job, Uploads
 
 
-# class UploadDetailView(DetailView):
+class UploadDetailView(UserPassesTestMixin, LoginRequiredMixin, DetailView):
+    # normally expects template as <app>/<model>_confirm_delete.html
+    model = Uploads
+    template_name = 'startpage/visualize.html'
+
+    def test_func(self):
+        job = self.get_object()
+        # get the job object being accessed and return true if it's equal to the owner of job
+        return self.request.user == job.user
 
 
 def delete_file(request, pk):

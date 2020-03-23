@@ -6,6 +6,7 @@
         <th>Title</th>
         <th>Date Uploaded</th>
         <th>Download</th>
+        <th>Visualize</th>
         <th>Delete</th>
       </tr>
     </thead>
@@ -13,17 +14,19 @@
       {% for file in files %}
         <tr>
           <td>{{ file.title }}</td>
-          <td>{{ file.date_uploaded|date:'F d, Y '}}at{{ file.date_uploaded|date:' f a' }}</td>
+          <td>{{ file.date_uploaded|date:'F d, Y'}} at {{ file.date_uploaded|date:'f a' }}</td>
           <td>
           <!--the context object is named files (as specifid in the view). Each
           instance of the files is called file (as specified in the for loop.
           'file' has a property called url that contains the path the actual
           file defined in filefield. see here:
           https://docs.djangoproject.com/en/dev/topics/files/-->
-            <a href="{{ file.file.url }}" class="btn btn-primary btn-sm" target="_blank">
-              Download File
-            </a>
+          <!--potentially insecure?-->
+            <a href="{{ file.file.url }}" class="btn btn-primary btn-sm" target="_blank">Download File</a>
           </td>
+          <td>
+            <a href="{% url 'visualize' file.pk %}" class="btn btn-primary btn-sm">View</a>
+          <td>
           <td>
             <form method="post" action="{% url 'delete_file' file.pk %}">
               {% csrf_token %}
