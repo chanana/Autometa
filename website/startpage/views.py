@@ -1,43 +1,52 @@
 import django_tables2 as tables
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
 from django.views.generic import (CreateView, DeleteView, DetailView, FormView,
                                   ListView, UpdateView)
-from .forms import SubmitResultsForm
-from .models import Job, UploadedJobResult
+from django.views.generic.edit import FormMixin
+
+from .forms import UploadsForm
+from .models import Job, Uploads
 
 
-class VisualizeResultsView(CreateView, LoginRequiredMixin):
-    model = UploadedJobResult
-    template_name = 'startpage/visualize.html'
-    context_object_name = 'results'
-    fields = ('title', 'result', 'user')
-
-    def get_queryset(self):
-        return super(VisualizeResultsView, self).get_queryset().filter(user=self.request.user)
+# class UploadDetailView(DetailView):
 
 
-class UploadResultsView(CreateView):
-    model = UploadedJobResult
-    form_class = SubmitResultsForm
-    template_name = 'startpage/upload_result.html'
-
-    def get_success_url(self):
-        messages.add_message(self.request, messages.SUCCESS,
-                             'Your file was uploaded successfully!')
-        # possible useful answer: https://stackoverflow.com/a/54965061
-        return reverse_lazy('startpage-home')
+def delete_file(request, pk):
+    if request.method == 'POST':
+        file = Uploads.objects.get(pk=pk)
+        file.delete()
+    return redirect('upload_list')
+    # possible class-based implementation here: https://stackoverflow.com/a/9423819
 
 
-class JobInProgressView(CreateView):
-    # TODO: make this into a fancy page showing what is happening to the submitted
-    # job or something?
-    template_name = 'startpage/job_in_progress.html'
+class UploadListView(LoginRequiredMixin, ListView):
+    model = Uploads
+    template_name = 'startpage/upload_list.html'
+    context_object_name = 'files'
+
+
+class UploadView(SuccessMessageMixin, CreateView):
+    model = Uploads
+    form_class = UploadsForm
+    success_url = reverse_lazy('upload_list')
+    template_name = 'startpage/upload.html'
+    ordering = ['-date_uploaded']
+
+    # add the user that uploaded the file to the user field.
+    # from here: https://gist.github.com/sleekslush/1667396
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+        return FormMixin.form_valid(self, form)
 
 
 class JobListView(LoginRequiredMixin, ListView):

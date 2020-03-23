@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import (UploadedJobResult, Job, Pangenome, MetagenomeAssembledGenome,
-                     Kmers, MajorityVote, Coverage, Markers, Contig, Metagenome)
-# Register your models here.
-admin.site.register([UploadedJobResult, Job, Pangenome, MetagenomeAssembledGenome,
-                     Kmers, MajorityVote, Coverage, Markers, Contig, Metagenome])
+import startpage.models as m
+
+admin.site.register([m.Uploads, m.Job, m.Pangenome, m.MetagenomeAssembledGenome,
+                     m.Kmers, m.MajorityVote, m.Coverage, m.Markers, m.Contig, m.Metagenome])

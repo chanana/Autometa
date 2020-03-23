@@ -1,11 +1,11 @@
 from django import forms
-from .models import UploadedJobResult
+from .models import Uploads
 
 
-class SubmitResultsForm(forms.ModelForm):
+class UploadsForm(forms.ModelForm):
     class Meta:
-        model = UploadedJobResult
-        fields = ('title', 'result')
+        model = Uploads
+        exclude = ('user', )
 
 
 class NewJobForm(forms.Form):

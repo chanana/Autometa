@@ -1,25 +1,24 @@
 from django.contrib.auth.models import User
 from django.db import models
-# we're using this to redirect the user once their form for a new job has been
-# filled. Redirect takes you to a specific route but reverse just returns the
-# url to that route as a string.
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-# Object relational mapper (ORM) allows access to database in an OOP way. You
-# can change databases (like SQLite vs Postgres) by setting it up in the
-# settings. The queries will remain the same. We can represent our database
-# structure using classes but here in django = they are called models.
 
-
-class UploadedJobResult(models.Model):
-    title = models.CharField(max_length=100)
-    result = models.FileField(upload_to='uploaded_results/')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+class Uploads(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=128)
+    description = models.TextField(
+        default='A file needs a description.', blank=True)
+    file = models.FileField(upload_to='uploads/')
+    date_uploaded = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return (self.title)
+        return self.title
+
+    def delete(self, *args, **kwargs):
+        self.file.delete()
+        super().delete(*args, **kwargs)
 
 
 class Metagenome(models.Model):
