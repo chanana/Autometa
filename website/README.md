@@ -23,6 +23,8 @@ pip install django_tables2
 ##### ADD THE FOLLOWING TO README PROPERLY; DATABASE MANAGEMENT IS A <GRAWLIX>
 TODO: add how to setup env variable `$PGDATA` following [this guide](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#macos-and-linux)
 
+[website that has been a good resource](http://ccbv.co.uk)
+
 answer that helped a TON: https://stackoverflow.com/questions/22975936/postgres-fatal-database-does-not-exist-django/22975979
 
 ```bash
