@@ -39,6 +39,7 @@ class UploadListView(LoginRequiredMixin, ListView):
     model = Uploads
     template_name = 'startpage/upload_list.html'
     context_object_name = 'files'
+    ordering = ['-date_uploaded']
 
 
 class UploadView(SuccessMessageMixin, CreateView):

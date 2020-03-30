@@ -1,131 +1,36 @@
 {% load static %}
 <!DOCTYPE html>
-<meta charset="utf-8">
-<!-- place where i took this code from and adapted it -->
-<!-- https://gist.github.com/mbostock/3887118 -->
-<style>
-    body {
-        font: 10px sans-serif;
-    }
+<html lang="en">
 
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: #000;
-        shape-rendering: crispEdges;
-    }
-
-    .dot {
-        stroke: #000;
-    }
-
-</style>
+<head>
+    <meta charset="UTF-8">
+    <!-- <script src="//cdn.plot.ly/plotly-latest.min.js"></script> -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
 
 <body>
-
     <!-- DetailView expects the context to be called object -->
+    <!-- <h6>
+        "{{ object.title }}" located at {{ object.file.url }} uploaded on 
+        {{object.date_uploaded|date:'F d, Y' }} is being plotted below.
+    </h6>-->
+    <!-- 
+    <div id="tester" style="width:960px;height:500px;">
+    </div> -->
+    <svg width='960' height='500'></svg>
+    <script src="{% static 'startpage/index.js' %}">
+        // d3.tsv("{{ object.file.url }}", function (data) {
+        //     console.log(data[0])
+        // });
 
-    <h6>{{ object.file.url }} uploaded on {{ object.date_uploaded|date:'F d, Y' }}</h6>
-    <script src="//d3js.org/d3.v3.min.js"></script>
-
-    <script>
-
-        var margin = { top: 20, right: 20, bottom: 30, left: 40 },
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
-
-        var x = d3.scale.linear()
-            .range([0, width]);
-
-        var y = d3.scale.linear()
-            .range([height, 0]);
-        
-        // color scheme specification
-        // https://github.com/d3/d3-scale-chromatic/blob/master/README.md#schemeCategory10
-        var color = d3.scale.category10();
-
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
-
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        d3.tsv('{{object.file.url}}', function (error, data) {//"data.tsv"
-            if (error) throw error;
-
-            data.forEach(function (d) {
-                d.x = +d.x;
-                d.y = +d.y;
-                // d.sepalLength = +d.sepalLength;
-                // d.sepalWidth = +d.sepalWidth;
-            });
-
-            x.domain(d3.extent(data, function (d) { return d.x; })).nice();
-            y.domain(d3.extent(data, function (d) { return d.y; })).nice();
-            // x.domain(d3.extent(data, function (d) { return d.sepalWidth; })).nice();
-            // y.domain(d3.extent(data, function (d) { return d.sepalLength; })).nice();
-
-            svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .append("text")
-                .attr("class", "label")
-                .attr("x", width)
-                .attr("y", -6)
-                .style("text-anchor", "end")
-                .text("X");//"Sepal Width (cm)");
-
-            svg.append("g")
-                .attr("class", "y axis")
-                .call(yAxis)
-                .append("text")
-                .attr("class", "label")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 6)
-                .attr("dy", ".71em")
-                .style("text-anchor", "end")
-                .text("Y");//Sepal Length (cm)")
-
-            svg.selectAll(".dot")
-                .data(data)
-                .enter().append("circle")
-                .attr("class", "dot")
-                .attr("r", 3.5)
-                .attr("cx", function (d) { return x(d.x); })
-                .attr("cy", function (d) { return y(d.y); })
-                .style("fill", function (d) { return color(d.phylum); });
-                // .attr("cx", function (d) { return x(d.sepalWidth); })
-                // .attr("cy", function (d) { return y(d.sepalLength); })
-                // .style("fill", function (d) { return color(d.species); });
-
-            var legend = svg.selectAll(".legend")
-                .data(color.domain())
-                .enter().append("g")
-                .attr("class", "legend")
-                .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
-
-            legend.append("rect")
-                .attr("x", width - 18)
-                .attr("width", 18)
-                .attr("height", 18)
-                .style("fill", color);
-
-            legend.append("text")
-                .attr("x", width - 24)
-                .attr("y", 9)
-                .attr("dy", ".35em")
-                .style("text-anchor", "end")
-                .text(function (d) { return d; });
-
-        });
-
+        // d3.select('tester');
+        // TESTER = document.getElementById('tester');
+        // Plotly.newPlot( TESTER, [{
+        // x: [1, 2, 3, 4, 5],
+        // y: [1, 2, 4, 8, 16] }], {
+        // margin: { t: 0 } } ); 
     </script>
+
+</body>
+
+</html>
