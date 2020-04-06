@@ -1,66 +1,319 @@
-const svg = d3.select('svg');
 
-const height = +svg.attr('height');
-const width = +svg.attr('width');
+var margin = {
+    top: 20,
+    right: 210,
+    bottom: 50,
+    left: 70
+},
+    outerWidth = 1050,
+    outerHeight = 500,
+    width = outerWidth - margin.left - margin.right,
+    height = outerHeight - margin.top - margin.bottom;
 
-const g = svg
-    .append('g')
-    .attr("transform", `translate(${width / 2},${height / 2})`);
+var x = d3.scale.linear()
+    .range([0, width]).nice();
 
-const face = g
-    .append('circle')
-    .attr('r', height / 2)
-    .attr('fill', 'yellow')
-    .attr('stroke', 'black');
+var y = d3.scale.linear()
+    .range([height, 0]).nice();
 
-const eyeSpacing = 100;
-const eyeYOffset = -70;
-const eyeRadius = 40;
-const eyeBrowWidth = 70;
-const eyeBrowHeight = 15;
-const eyeBrowYOffset = -70;
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickSize(-height);
 
-const eyesG = g
-    .append('g')
-    .attr("transform", `translate(0,${eyeYOffset})`);
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickSize(-width);
 
-const leftEye = eyesG
-    .append('circle')
-    .attr('r', eyeRadius)
-    .attr('cx', -eyeSpacing)
+var xCat = "x",
+    // xCat = "age",
+    // yCat = "Prob_Mortality",
+    yCat = "y",
+    // rCat = "los_icu", //describes size of circle
+    rCat = "completeness",
+    // colorCat = "first_careunit";
+    colorCat = "phylum";
 
-const rightEye = eyesG
-    .append('circle')
-    .attr('r', eyeRadius)
-    .attr('cx', eyeSpacing)
+var labels = {
+    "x": "X cooridnate",
+    "y": "Y coordinate",
+    "completeness": "completeness",
+    "phylum": "Phylum"
+    // "los_icu": "Length of stay in ICU",
+    // "Prob_Mortality": "Probability",
+    // "age": "Age"
+}
+const fileName = d3.select("#hello")
+    .attr("tsvFile")
 
-const eyeBrowsG = eyesG
-    .append('g')
-    .attr("transform", `translate(0,${eyeBrowYOffset})`);
+d3.tsv(fileName, function (data) {
+    data.forEach(function (d) {
+        d.x = +d.x;
+        d.y = +d.y;
+        d.completeness = +d.completeness;
+        d.purity = +d.purity;
+        // d.Prob_Mortality = +d.Prob_Mortality;
+        // d.icustay_id = +d.icustay_id;
+        // d.age = +d.age;
+        // d.los_icu = +d.los_icu;
+        // d.hospital_expire_flag = +d.hospital_expire_flag;
+        // d.first_careunit = d.first_careunit;
+    });
 
-eyeBrowsG
-    .transition().duration(2000)
-    .attr("transform", `translate(0,${eyeBrowYOffset - 50})`)
-    .transition().duration(2000)
-    .attr("transform", `translate(0,${eyeBrowYOffset})`)
+    var xMax = d3.max(data, function (d) {
+        return d[xCat];
+    }) * 1.05,
+        xMin = d3.min(data, function (d) {
+            return d[xCat];
+        }),
+        // if min is greater than 0, put 0 else put min
+        xMin = xMin > 0 ? 0 : xMin,
+        yMax = d3.max(data, function (d) {
+            return d[yCat];
+        }) * 1.05,
+        yMin = d3.min(data, function (d) {
+            return d[yCat];
+        }),
+        yMin = yMin > 0 ? 0 : yMin;
+    x.domain([xMin, xMax]);
+    y.domain([yMin, yMax]);
 
-const leftEyeBrow = eyeBrowsG
-    .append('rect')
-    .attr('x', -eyeSpacing - eyeBrowWidth / 2)
-    .attr('width', eyeBrowWidth)
-    .attr('height', eyeBrowHeight)
+    var color = d3.scale.category10();
 
-const rightEyeBrow = eyeBrowsG
-    .append('rect')
-    .attr('x', eyeSpacing - eyeBrowWidth / 2)
-    .attr('width', eyeBrowWidth)
-    .attr('height', eyeBrowHeight)
+    var tip = d3.tip()
+        .attr("class", "d3-tip")
+        .offset([-10, 0])
+        .html(function (d) {
+            return labels[xCat] + ": " + d[xCat] + "<br>" + labels[yCat] + ": " + d[yCat] + "<br>" + labels[rCat] + ": " + d[rCat];
+        });
 
-const smile = g
-    .append('path')
-    .attr('d', d3.arc()({
-        innerRadius: 150,
-        outerRadius: 170,
-        startAngle: Math.PI / 2,
-        endAngle: Math.PI * 3 / 2
-    }))
+    var zoomBeh = d3.behavior.zoom()
+        .x(x)
+        .y(y)
+        .scaleExtent([0, 1000])
+        .on("zoom", zoom);
+
+    var svg = d3.select("#scatter")
+        .append("svg")
+        .attr("width", outerWidth)
+        .attr("height", outerHeight)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(zoomBeh);
+    svg.call(tip);
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height);
+    svg.append("g")
+        .classed("x axis", true)
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .append("text")
+        .classed("label", true)
+        .attr("x", width)
+        .attr("y", margin.bottom - 10)
+        .style("text-anchor", "end")
+        // .text("Age");
+        .text("X Coordinate");
+    svg.append("g")
+        .classed("y axis", true)
+        .call(yAxis)
+        .append("text")
+        .classed("label", true)
+        .attr("transform", "rotate(-90)")
+        .attr("y", -margin.left)
+        .attr("dy", "1.5em")
+        .style("text-anchor", "end")
+        // .text("Probability of Mortality");
+        .text("Y Coordinate ");
+
+    var objects = svg.append("svg")
+        .classed("objects", true)
+        .attr("width", width)
+        .attr("height", height);
+    objects.append("svg:line")
+        .classed("axisLine hAxisLine", true)
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", width)
+        .attr("y2", 0)
+        .attr("transform", "translate(0," + height + ")");
+    objects.append("svg:line")
+        .classed("axisLine vAxisLine", true)
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", 0)
+        .attr("y2", height);
+    objects.selectAll(".dot")
+        .data(data)
+        .enter().append("circle")
+        .classed("dot", true)
+        .attr({
+            r: function (d) {
+                return 4 * Math.sqrt(d[rCat] / Math.PI);
+            },
+            cx: function (d) {
+                return x(d[xCat]);
+            },
+            cy: function (d) {
+                return y(d[yCat]);
+            }
+        })
+        .style("fill", function (d) {
+            return color(d[colorCat]);
+        })
+        .on("mouseover", tip.show)
+        .on("mouseout", tip.hide);
+
+    var legend = svg.selectAll(".legend")
+        .data(color.domain())
+        .enter().append("g")
+        .classed("legend", true)
+        .attr("transform", function (d, i) {
+            return "translate(0," + i * 20 + ")";
+        });
+    legend.append("rect")
+        .attr("x", width + 10)
+        .attr("width", 12)
+        .attr("height", 12)
+        .style("fill", color);
+    legend.on("click", function (type) {
+        // dim all of the icons in legend
+        d3.selectAll(".legend")
+            .style("opacity", 0.1);
+        // make the one selected be un-dimmed
+        d3.select(this)
+            .style("opacity", 1);
+        // select all dots and apply 0 opacity (hide)
+        d3.selectAll(".dot")
+            // .transition()
+            // .duration(500)
+            .style("opacity", 0.0)
+            // filter out the ones we want to show and apply properties
+            .filter(function (d) {
+                return d["phylum"] == type;
+                // return d["first_careunit"] == type;
+            })
+            .style("opacity", 1) // need this line to unhide dots
+            .style("stroke", "black")
+            // apply stroke rule
+            .style("fill", function (d) {
+                if (d.hospital_expire_flag == 1) {
+                    return this
+                } else {
+                    return "white"
+                };
+            });
+    });
+    legend.append("text")
+        .attr("x", width + 26)
+        .attr("dy", ".65em")
+        .text(function (d) {
+            return d;
+        });
+    d3.select("button.reset").on("click", change)
+    // d3.select("button.changexlos").on("click", updateX)
+
+    function change() {
+        xMax = d3.max(data, function (d) {
+            return d[xCat];
+        });
+        xMin = d3.min(data, function (d) {
+            return d[xCat];
+        });
+        zoomBeh.x(x.domain([xMin, xMax])).y(y.domain([yMin, yMax]));
+
+        var svg = d3.select("#scatter").transition();
+        svg.select(".x.axis").duration(750).call(xAxis).select(".label").text(labels[xCat]);
+        objects.selectAll(".dot").transition().duration(1000)
+            .attr({
+                r: function (d) {
+                    return 4 * Math.sqrt(d[rCat] / Math.PI);
+                },
+                cx: function (d) {
+                    return x(d[xCat]);
+                },
+                cy: function (d) {
+                    return y(d[yCat]);
+                }
+            })
+    }
+
+    function zoom() {
+        svg.select(".x.axis").call(xAxis);
+        svg.select(".y.axis").call(yAxis);
+        svg.selectAll(".dot")
+            .attr({
+                cx: function (d) {
+                    return x(d[xCat]);
+                },
+                cy: function (d) {
+                    return y(d[yCat]);
+                }
+            })
+        // .attr("transform", transform);
+    }
+
+    function transform(d) {
+        return "translate(" + x(d[xCat]) + "," + y(d[yCat]) + ")";
+    }
+
+    // function updateX() {
+    //     xCat = "los_icu",
+    //         yCat = "Prob_Mortality",
+    //         rCat = "age",
+    //         colorCat = "first_careunit";
+    //     xMax = d3.max(data, function (d) {
+    //         return d[xCat];
+    //     }) * 1.05,
+    //         xMin = d3.min(data, function (d) {
+    //             return d[xCat];
+    //         }),
+    //         xMin = xMin > 0 ? 0 : xMin,
+    //         yMax = d3.max(data, function (d) {
+    //             return d[yCat];
+    //         }) * 1.05,
+    //         yMin = d3.min(data, function (d) {
+    //             return d[yCat];
+    //         }),
+    //         yMin = yMin > 0 ? 0 : yMin;
+    //     x.domain([xMin, xMax]);
+    //     y.domain([yMin, yMax]);
+
+    //     var zoomBeh = d3.behavior.zoom()
+    //         .x(x)
+    //         .y(y)
+    //         .scaleExtent([0, 1000])
+    //         .on("zoom", zoom);
+
+    //     var svg = d3.select("svg").transition();
+    //     svg.select(".y.axis")
+    //         .duration(1000)
+    //         .call(yAxis);
+    //     svg.select('.x.axis')
+    //         .duration(1000)
+    //         .call(xAxis);
+    //     svg.select('.label')
+    //         .duration(1000)
+    //         .attr("x", width)
+    //         .attr("y", margin.bottom - 10)
+    //         .style("text-anchor", "end")
+    //         .text("Length of Stay");
+
+    //     d3.selectAll("circle.dot")
+    //         .transition()
+    //         .duration(1000)
+    //         .attr({
+    //             r: function (d) {
+    //                 return 4 * Math.sqrt(d[rCat] / Math.PI);
+    //             },
+    //             cx: function (d) {
+    //                 return x(d[xCat]);
+    //             },
+    //             cy: function (d) {
+    //                 return y(d[yCat]);
+    //             }
+    //         })
+    // }
+});
