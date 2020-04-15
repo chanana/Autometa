@@ -1,0 +1,26 @@
+{% extends 'startpage/base.html' %}
+<!--DetailView expects the context to be called object-->
+{% block content %}
+    <article class="media content-section">
+        <div class="media-body">
+            <h2 class="article-title">{{ object.title }}</h2>
+            <p class="article-content">{{ object.description }}</p>
+            <div class="article-metadata">
+                <small class="text-muted">Uploaded on {{ object.date_uploaded|date:'F d, Y'}} at {{ object.date_uploaded|date:'f a' }}</small>
+                {% if object.user == user %}
+                    <div>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'visualize' object.pk %}">Visualize</a>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ object.file.url }}" target="_blank">Download</a>
+                        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'uploads-delete' object.id %}">Delete</a>
+                        <!--the context object 'object' has a property called
+                        'file' which has a property called 'url' that contains
+                        the path the actual file defined in filefield. see
+                        here:
+                        https://docs.djangoproject.com/en/dev/topics/files/-->
+                        <!--potentially insecure?-->
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+{% endblock content %}

@@ -142,6 +142,9 @@ MEDIA_URL = '/media/'
 # # for crispy forms app
 CRISPY_TEMPLATE_PACK = local_settings.crispy_template_pack
 
+# # for django_tables2
+# DJANGO_TABLES2_TEMPLATE = local_settings.django_tables2_template
+
 # # default redirect url once user logs in
 LOGIN_REDIRECT_URL = local_settings.login_redirect_url
 

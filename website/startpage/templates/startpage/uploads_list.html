@@ -3,36 +3,19 @@
     <table class="table mb-0">
     <thead>
       <tr>
+        <th>#</th>
         <th>Title</th>
         <th>Date Uploaded</th>
-        <th>Download</th>
-        <th>Visualize</th>
-        <th>Delete</th>
+        <th>Details</th>
       </tr>
     </thead>
     <tbody>
       {% for file in files %}
         <tr>
+          <td>{{ forloop.counter }}</td>
           <td>{{ file.title }}</td>
           <td>{{ file.date_uploaded|date:'F d, Y'}} at {{ file.date_uploaded|date:'f a' }}</td>
-          <td>
-          <!--the context object is named files (as specifid in the view). Each
-          instance of the files is called file (as specified in the for loop.
-          'file' has a property called url that contains the path the actual
-          file defined in filefield. see here:
-          https://docs.djangoproject.com/en/dev/topics/files/-->
-          <!--potentially insecure?-->
-            <a href="{{ file.file.url }}" class="btn btn-primary btn-sm" target="_blank">Download File</a>
-          </td>
-          <td>
-            <a href="{% url 'visualize' file.pk %}" class="btn btn-primary btn-sm">View</a>
-          <td>
-          <td>
-            <form method="post" action="{% url 'delete_file' file.pk %}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-            </form>
-          </td>
+          <td><a href="{% url 'uploads-detail' file.pk %}" class="btn btn-primary btn-sm">Details</a></td>
         </tr>
       {% endfor %}
     </tbody>
