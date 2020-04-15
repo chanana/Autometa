@@ -2,7 +2,7 @@
 d3/
 
 ## Taken from: https://github.com/github/gitignore/blob/master/Node.gitignore
-# Logs
+#Logs
 logs
 *.log
 npm-debug.log*
@@ -261,6 +261,8 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
+auto-mpg.csv
+population.csv
 
 # Flask stuff:
 instance/
