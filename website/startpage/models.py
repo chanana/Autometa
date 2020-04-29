@@ -112,3 +112,147 @@ class Job(models.Model):
         # their new job. Since the job-detail page url is job/<pk>, we need to
         # specify that we get that back as a string in kwargs.
         return reverse('job-detail', kwargs={'pk': self.pk})
+
+
+# class NewJob(models.Model):
+#     title = models.CharField(max_length=127)
+#     date_run = models.DateTimeField(default=timezone.now)
+#     description = models.TextField(default="a job needs a description")
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     # [files]
+#     # metagenome = metagenome.fna
+#     metagenome = models.FileField(upload_to='uploads/job_input/metagenomes/')
+#     # # Multiple Reads files of respective format may be provided using a comma-delimiter
+#     # TODO: Ask evan which fields are required. also ask about the fields at the bottom that don't have fields setup yet.
+
+#     AT LEAST ONE
+#     # fwd_reads = fwd_reads.fastq, fwd_reads.fastq
+#     fwd_reads = models.FileField(upload_to='uploads/job_input/fwd_reads/')
+#     # rev_reads = rev_reads.fastq
+#     rev_reads = models.FileField(upload_to='uploads/job_input/rev_reads/')
+#     # se_reads = se_reads.fastq
+#     se_reads = models.FileField(upload_to='uploads/job_input/se_reads/')
+#     # sam = alignments.sam
+#     sam = models.FileField(upload_to='uploads/job_input/sam/')
+#     # bam = alignments.bam
+#     bam = models.FileField(upload_to='uploads/job_input/bam/')
+
+#     # lengths = lengths.tsv
+#     lengths = models.FileField(upload_to='uploads/job_input/lengths/')
+#     # bed = alignments.bed
+#     bed = models.FileField(upload_to='uploads/job_input/bed/')
+#     # length_filtered = metagenome.filtered.fna
+#     length_filtered = models.FileField(
+#         upload_to='uploads/job_input/length_filtered/')
+#     # coverages = coverages.tsv
+#     coverages = models.FileField(upload_to='uploads/job_input/coverages/')
+#     # kmer_counts = kmers.tsv
+#     kmer_counts = models.FileField(
+#         upload_to='uploads/job_input/kmer_counts/')
+#     # kmer_normalized = kmers.normalized.tsv
+#     kmer_normalized = models.FileField(
+#         upload_to='uploads/job_input/kmer_normalized/')
+#     # kmer_embedded = kmers.embedded.tsv
+#     kmer_embedded = models.FileField(
+#         upload_to='uploads/job_input/kmer_embedded/')
+#     # nucleotide_orfs = metagenome.filtered.orfs.fna
+#     nucleotide_orfs = models.FileField(
+#         upload_to='uploads/job_input/nucleotide_orfs/')
+#     # amino_acid_orfs = metagenome.filtered.orfs.faa
+#     amino_acid_orfs = models.FileField(
+#         upload_to='uploads/job_input/amino_acid_orfs/')
+#     # blastp = blastp.tsv
+#     blastp = models.FileField(upload_to='uploads/job_input/blastp/')
+#     # blastp_hits = blastp.hits.pkl.gz
+#     blastp_hits = models.FileField(
+#         upload_to='uploads/job_input/blastp_hits/')
+#     # blastx = blastx.tsv
+#     blastx = models.FileField(upload_to='uploads/job_input/blastx/')
+#     # taxonomy = taxonomy.tsv
+#     taxonomy = models.FileField(upload_to='uploads/job_input/taxonomy/')
+#     # bacteria_hmmscan = bacteria.hmmscan.tsv
+#     bacteria_hmmscan = models.FileField(
+#         upload_to='uploads/job_input/bacteria_hmmscan/')
+#     # bacteria_markers = bacteria.markers.tsv
+#     bacteria_markers = models.FileField(
+#         upload_to='uploads/job_input/bacteria_markers/')
+#     # archaea_hmmscan = archaea.hmmscan.tsv
+#     archaea_hmmscan = models.FileField(
+#         upload_to='uploads/job_input/archaea_hmmscan/')
+#     # archaea_markers = archaea.markers.tsv
+#     archaea_markers = models.FileField(
+#         upload_to='uploads/job_input/archaea_markers/')
+#     # binning = binning.tsv
+#     binning = models.FileField(upload_to='uploads/job_input/binning/')
+#     # checkpoints = checkpoints.tsv
+#     checkpoints = models.FileField(
+#         upload_to='uploads/job_input/checkpoints/')
+
+#     # [parameters]
+#     # workspace = <required>
+#     # project = 1
+#     # metagenome_num = 0
+
+#     # kingdom = bacteria # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1691724/pdf/15306349.pdf
+
+#     KINGDOM_CHOICES = [
+#         ('BCT', 'Bacteria'),
+#         ('PRZ', 'Protozoa'),
+#         ('ANL', 'Animalia'),
+#         ('FNG', 'Fungi'),
+#         ('PLT', 'Plantae')
+#     ]
+#     kingdom = models.CharField(
+#         choices=KINGDOM_CHOICES,
+#         default=KINGDOM_CHOICES.BCT
+#     )
+#     # length_cutoff = 3000
+#     length_cutoff = models.PositiveIntegerField()
+#     # cov_from_spades = False
+#     cov_from_spades = models.BooleanField(default=False)
+
+#     # kmer_size = 5 # might be
+#     KMER_CHOICES = [(i, i) for i in range(3:10)]
+#     kmer_size = models.IntegerField(
+#         choices=KMER_CHOICES,
+#         default=(5, 5)
+#     )
+#     # kmer_multiprocess = True
+#     kmer_multiprocess = models.BooleanField(default=True)
+#     # kmer_normalize = True
+#     kmer_normalize = models.BooleanField(default=True)
+#     # do_pca = True
+#     do_pca = models.BooleanField(default=True)
+#     # pca_dims = 50
+#     pca_dims = models.IntegerField(default=50)
+
+#     # embedding_method = UMAP
+#     EMBEDDING_METHOD_CHOICES = [
+#         ('UMAP', 'UMAP'),
+#         ('TMAP', 'TMAP'),
+#         ('BHTSNE', 'BH-tSNE')
+#     ]
+#     embedding_method = models.TextField(
+#         choices=EMBEDDING_METHOD_CHOICES,
+#         default=EMBEDDING_METHOD_CHOICES.UMAP
+#     )
+#     # taxon_method = majority_vote
+#     # taxon_method = models.
+#     # reversed = True
+#     is_reversed = models.BooleanField(default=True)
+#     # binning_method = recursive_dbscan
+#     # binning_method = models.
+#     # completeness = 20.0
+#     completeness = models.FloatField(default=20.0)
+#     # purity = 90.0
+#     purity = models.FloatField(default=90.0)
+#     # verbose = False
+#     verbose = models.BooleanField(default=False)
+#     # force = False
+#     force = models.BooleanField(default=False)
+#     # usepickle = True
+#     usepickle = models.BooleanField(default=True)
+#     # parallel = False
+#     parallel = models.BooleanField(default=True)
+#     # cpus = 1
+#     cpus = models.IntegerField(default=1)

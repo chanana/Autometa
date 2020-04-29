@@ -1,4 +1,4 @@
-from django_tables2 import SingleTableView
+# from django_tables2 import SingleTableView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -14,7 +14,7 @@ from django.views.generic.edit import FormMixin
 
 from .forms import UploadsForm
 from .models import Job, Uploads
-from .tables import UploadsTable
+# from .tables import UploadsTable
 
 
 # class UploadsTableView(LoginRequiredMixin, SingleTableView):

@@ -23,7 +23,6 @@ installed_apps = [
     'startpage.apps.StartpageConfig',
     'users.apps.UsersConfig',
     'crispy_forms',
-    'django_tables2',
 ]
 
 static_url = '/static/'

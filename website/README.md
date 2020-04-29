@@ -15,7 +15,7 @@ conda activate autometa
 conda install --file requirements.txt
 
 # install django_tables2
-pip install django_tables2
+# pip install django_tables2
 ```
 
 ### 3. Database management
