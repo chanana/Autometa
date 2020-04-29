@@ -1,4 +1,5 @@
-# Ignore d3 for now
+# ignore random pdf for dev purposes
+autometaDashboard.pdf
 d3/
 
 ## Taken from: https://github.com/github/gitignore/blob/master/Node.gitignore
