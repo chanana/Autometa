@@ -2,8 +2,7 @@ const tsvFile = d3.select("#tsvFile").attr("tsvFile");
 var chartBox = document.querySelector("#graphics_2d");
 
 const chartBoxWidth = chartBox.getBoundingClientRect().width;
-// make height and width same for ease
-// const chartBoxHeight = chartBoxWidth;
+
 
 var margin = {
   top: 0.1 * chartBoxWidth,
@@ -15,10 +14,18 @@ var margin = {
   height = chartBoxWidth - margin.top - margin.bottom;
 
 const getChosenXAxis = function () {
-  return document.getElementById("choices_graphics_2d_x").value;
+  let e = document.getElementById("choices_graphics_2d_x");
+  return {
+    value: e.value,
+    text: e.options[e.selectedIndex].text
+  };
 }
 const getChosenYAxis = function () {
-  return document.getElementById("choices_graphics_2d_y").value;
+  let e = document.getElementById("choices_graphics_2d_y");
+  return {
+    value: e.value,
+    text: e.options[e.selectedIndex].text
+  };
 }
 // var chosenRadius = "completeness";
 // var xTipLabel = "Completeness: ";
@@ -41,12 +48,12 @@ d3.tsv(tsvFile).then(data => {
 
   // init x scale
   var x = d3.scaleLinear()
-    .domain(d3.extent(data, d => d[getChosenXAxis()]))
+    .domain(d3.extent(data, d => d[getChosenXAxis().value]))
     .range([0, width])
     .nice();
   // init y scale
   var y = d3.scaleLinear()
-    .domain(d3.extent(data, d => d[getChosenYAxis()]))
+    .domain(d3.extent(data, d => d[getChosenYAxis().value]))
     .range([height, 0])
     .nice();
   // init r scale
@@ -88,11 +95,25 @@ d3.tsv(tsvFile).then(data => {
   var gxAxis = svg.append("g")
     .attr("class", "axis axis--x")
     .attr("transform", `translate(0, ${height})`)
-    .call(xAxis);
+    .call(xAxis)
+
+  svg.append("text")
+    .attr("class", "label--x")
+    .attr("transform", `translate(${width / 2}, ${margin.top / 2 + height})`)
+    .attr('text-anchor', 'middle')
+    .attr("fill", "#000")
+    .text(getChosenXAxis().text);
 
   var gyAxis = svg.append("g")
     .attr("class", "axis axis--y")
     .call(yAxis);
+
+  svg.append("text")
+    .attr("class", "label--y")
+    .attr('transform', `translate(${-margin.left / 2}, ${height / 2}) rotate(-90)`)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#000')
+    .text(getChosenYAxis().text);
 
   var scatter = svg.append('svg')
     .attr("class", "scatter")
@@ -103,8 +124,8 @@ d3.tsv(tsvFile).then(data => {
     .data(data)
     .enter().append("circle")
     .attr("class", "dot")
-    .attr("cx", d => x(d[getChosenXAxis()]))
-    .attr("cy", d => y(d[getChosenYAxis()]))
+    .attr("cx", d => x(d[getChosenXAxis().value]))
+    .attr("cy", d => y(d[getChosenYAxis().value]))
     .attr("r", d => r(d['contig_length']))
     .attr("fill", "#89bdd3")
     .attr("opacity", ".5")
@@ -121,13 +142,18 @@ d3.tsv(tsvFile).then(data => {
       .duration(750)
       .call(xAxis.scale(x));
 
+    // transition circles
     svg.selectAll('circle')
       .data(data)
       .transition()
       .duration(750)
       .attr("cx", d => x(d[field]))
-      .attr("cy", d => y(d[getChosenYAxis()]))
+      .attr("cy", d => y(d[getChosenYAxis().value]))
       .attr("r", d => r(d['contig_length']));
+
+    // transition x axis label
+    svg.select('.label--x')
+      .text(getChosenXAxis().text);
   }
 
   function updateY() {
@@ -144,10 +170,14 @@ d3.tsv(tsvFile).then(data => {
       .data(data)
       .transition()
       .duration(750)
-      .attr("cx", d => x(d[getChosenXAxis()]))
+      .attr("cx", d => x(d[getChosenXAxis().value]))
       .attr("cy", d => y(d[field]));
 
+    // transition x axis label
+    svg.select('.label--y')
+      .text(getChosenYAxis().text);
   }
+  // Event Listeners for Changing axes
   d3.select("#choices_graphics_2d_x").on("change", updateX);
   d3.select("#choices_graphics_2d_y").on("change", updateY);
 
@@ -163,8 +193,8 @@ d3.tsv(tsvFile).then(data => {
 
     // update circle position
     scatter.selectAll("circle")
-      .attr('cx', d => newX(d[getChosenXAxis()]))
-      .attr('cy', d => newY(d[getChosenYAxis()]))
+      .attr('cx', d => newX(d[getChosenXAxis().value]))
+      .attr('cy', d => newY(d[getChosenYAxis().value]))
   }
 
   // zoom toggle functionality; https://stackoverflow.com/a/29762389/9206532
