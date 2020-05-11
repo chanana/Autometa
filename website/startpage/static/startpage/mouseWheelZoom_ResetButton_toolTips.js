@@ -210,7 +210,7 @@ d3.tsv(tsvFile, data => {
         .on("mouseover", tip.show)
         .on("mouseout", tip.hide);
     } else {
-      d3.select("circle")
+      d3.selectAll("circle")
         .on("mouseover", null)
         .on("mouseover", null);
     }
