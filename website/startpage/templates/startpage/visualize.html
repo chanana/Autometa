@@ -7,7 +7,7 @@
     <title>Scatter Plot</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!-- <link rel="stylesheet" href="{% static 'startpage/scatter.css' %}" charset="utf-8"> -->
+    <link rel="stylesheet" href="{% static 'startpage/scatter.css' %}" charset="utf-8">
 </head>
 
 <body>
@@ -58,8 +58,9 @@
                 </select>
             </div>
             <div class="col-md-2 text-center">
-                <!-- <button id="zoom_toggle" class="btn btn-primary">Toggle zoom</button></p>
-                <button id="zoom_reset" class="btn btn-primary">Reset zoom</button> -->
+                <button id="zoom_toggle" class="btn btn-primary">Toggle zoom</button>
+                <button id="zoom_reset" class="btn btn-primary">Reset zoom</button>
+                <button id="tooltip_toggle" class="btn btn-primary">Toggle Tooltips</button>
             </div>
         </div>
         <div class="row" id="big_number_stats">
@@ -80,7 +81,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"></script>
-    <script id="tsvFile" src="{% static 'startpage/brushedZoom.js' %}" charset="utf-8"
+    <script id="tsvFile" src="{% static 'startpage/mouseWheelZoom_ResetButton_toolTips.js' %}" charset="utf-8"
         tsvFile="{{object.file.url}}"></script>
 </body>
 
