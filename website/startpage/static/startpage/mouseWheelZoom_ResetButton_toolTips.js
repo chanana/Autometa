@@ -25,7 +25,7 @@ const getChosenYAxis = function () {
 // var yTipLabel = "Purity: ";
 
 // Retrieve data from the TSV file and execute everything below
-d3.tsv(tsvFile, data => {
+d3.tsv(tsvFile).then(data => {
 
   // parse data
   data.forEach(function (d) {
