@@ -178,6 +178,8 @@ d3.tsv(tsvFile).then(data => {
         .range([0, width])
         .nice();
     }
+    // reset the zoom state so that the zoom event understands that you are no longer zoomed.
+    resetZoom();
 
     // transition x axis
     gxAxis.transition()
@@ -210,6 +212,8 @@ d3.tsv(tsvFile).then(data => {
         .range([height, 0])
         .nice();
     }
+    // reset the zoom state so that the zoom event understands that you are no longer zoomed.
+    resetZoom();
 
     // transition x axis
     gyAxis.transition()
