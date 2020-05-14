@@ -19,35 +19,28 @@
     <div class="container">
         <div class="row" id="drop_down_menus">
             <div class="col-md-2 text-center">
-                <select id="choices_graphics_3d_z">
-                    <option value="coverage">Coverage</option>
-                    <option value="gc">GC %</option>
-                    <option value="length">Length</option>
-                </select>
-            </div>
-            <div class="col-md-2 text-center">
-                <select id="bin_summary_cluster">
-                    <option value="decision_tree_classifier">Decision Tree Classifier</option>
-                    <option value="cluster">Cluster</option>
-                    <option value="paired_end_refinement">Paired-end Refinement</option>
-                </select>
-            </div>
-            <div class="col-md-2 text-center">
+                <b>Choose X Axis</b>
                 <select id="choices_graphics_2d_x">
                     <option value="x">BH-tSNE-x</option>
                     <option value="coverage">Coverage</option>
-                    <option value="GC">GC %</option>
+                    <option value="gc">GC %</option>
+                    <option value="contig_length">Contig Length</option>
                 </select>
             </div>
             <div class="col-md-2 text-center">
+                <b>Choose Y Axis</b>
                 <select id="choices_graphics_2d_y">
                     <option value="y">BH-tSNE-y</option>
                     <option value="coverage">Coverage</option>
-                    <option value="GC">GC %</option>
+                    <option value="gc">GC %</option>
+                    <option value="contig_length">Contig Length</option>
                 </select>
             </div>
             <div class="col-md-2 text-center">
-                <select id="taxa_by_rank">
+                <b>Choose a fill color</b>
+                <select id="choices_graphics_2d_circle_color">
+                    <option value="cluster">Cluster</option>
+                    <option value="taxid">TaxID</option>
                     <option value="kingdom">Kingdom</option>
                     <option value="phylum">Phylum</option>
                     <option value="class">Class</option>
@@ -58,20 +51,20 @@
                 </select>
             </div>
             <div class="col-md-2 text-center">
-                <button id="zoom_toggle" class="btn btn-primary">Toggle zoom</button>
-                <button id="zoom_reset" class="btn btn-primary">Reset zoom</button>
+                <b>Choose a radius</b>
+                <select id="choices_graphics_2d_circle_radius">
+                    <option value="completeness">Completeness</option>
+                    <option value="purity">Purity</option>
+                    <option value="contig_length">Contig Length</option>
+                    <option value="coverage">Coverage</option>
+                    <option value="gc">GC %</option>
+                </select>
+            </div>
+            <div class="col-md-4 text-center">
+                <b>Toggles</b><br>
+                <button id="zoom_toggle" class="btn btn-primary">Toggle zoom</button><br>
+                <button id="zoom_reset" class="btn btn-primary">Reset zoom</button><br>
                 <button id="tooltip_toggle" class="btn btn-primary">Toggle Tooltips</button>
-            </div>
-        </div>
-        <div class="row" id="big_number_stats">
-            <div class="col-md-4 text-center" id="big_number_stats_marker">
-                <h5>Marker Sets</h5>
-            </div>
-            <div class="col-md-4 text-center" id="big_number_stats_completeness">
-                <h5>Completeness</h5>
-            </div>
-            <div class="col-md-4 text-center" id="big_number_stats_purity">
-                <h5>Purity</h5>
             </div>
         </div>
         <div class="row" id="graphics">

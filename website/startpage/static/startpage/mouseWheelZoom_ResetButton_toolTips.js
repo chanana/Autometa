@@ -27,6 +27,16 @@ const getChosenYAxis = function () {
     text: e.options[e.selectedIndex].text
   };
 }
+
+const getChosenCircleColor = function () {
+  let e = document.getElementById("choices_graphics_2d_circle_color");
+  return e.value;
+}
+
+const getChosenRadius = function () {
+  let e = document.getElementById("choices_graphics_2d_circle_radius");
+  return e.value;
+}
 // var chosenRadius = "completeness";
 // var xTipLabel = "Completeness: ";
 // var yTipLabel = "Purity: ";
@@ -36,30 +46,54 @@ d3.tsv(tsvFile).then(data => {
 
   // parse data
   data.forEach(function (d) {
-    d.coverage = +d.coverage;
-    d.contig_length = +d.contig_length;
     d.completeness = +d.completeness;
     d.purity = +d.purity;
     d.x = +d.x;
     d.y = +d.y;
-    d.GC = +d.GC;
     d.contig_length = +d.contig_length;
+    d.coverage = +d.coverage;
+    d.gc = +d.GC;
   });
 
   // init x scale
-  var x = d3.scaleLinear()
-    .domain(d3.extent(data, d => d[getChosenXAxis().value]))
-    .range([0, width])
-    .nice();
+  if (getChosenXAxis().value === "contig_length") {
+    var x = d3.scaleLog()
+      .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+      .range([0, width])
+      .nice();
+  } else {
+    var x = d3.scaleLinear()
+      .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+      .range([0, width])
+      .nice();
+  }
+
   // init y scale
-  var y = d3.scaleLinear()
-    .domain(d3.extent(data, d => d[getChosenYAxis().value]))
-    .range([height, 0])
-    .nice();
+  if (getChosenYAxis().value === "contig_length") {
+    var y = d3.scaleLog()
+      .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+      .range([height, 0])
+      .nice();
+  } else {
+    var y = d3.scaleLinear()
+      .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+      .range([height, 0])
+      .nice();
+  }
+
   // init r scale
-  var r = d3.scaleLog()
-    .domain(d3.extent(data, d => d['contig_length']))
-    .range([5, 25])
+  if (getChosenRadius() === "contig_length") {
+    var radius = d3.scaleLog()
+      .domain(d3.extent(data, d => d[getChosenRadius()]))
+      .range([5, 25]);
+  } else {
+    var radius = d3.scaleLinear()
+      .domain(d3.extent(data, d => d[getChosenRadius()]))
+      .range([5, 25]);
+  }
+
+  var color = d3.scaleOrdinal()
+    .range(d3.schemeTableau10);
 
   var tip = d3.tip()
     .attr('class', 'd3-tip')
@@ -126,16 +160,24 @@ d3.tsv(tsvFile).then(data => {
     .attr("class", "dot")
     .attr("cx", d => x(d[getChosenXAxis().value]))
     .attr("cy", d => y(d[getChosenYAxis().value]))
-    .attr("r", d => r(d['contig_length']))
-    .attr("fill", "#89bdd3")
+    .attr("r", d => radius(d[getChosenRadius()]))
+    .attr("fill", d => color(d[getChosenCircleColor()]))
     .attr("opacity", ".5")
 
   // update x axis
   function updateX() {
     let field = this.value;
-
-    x.domain(d3.extent(data, d => d[field]))
-      .nice();
+    if (field === 'contig_length') {
+      x = d3.scaleLog()
+        .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+        .range([0, width])
+        .nice();
+    } else {
+      x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+        .range([0, width])
+        .nice();
+    }
 
     // transition x axis
     gxAxis.transition()
@@ -149,7 +191,6 @@ d3.tsv(tsvFile).then(data => {
       .duration(750)
       .attr("cx", d => x(d[field]))
       .attr("cy", d => y(d[getChosenYAxis().value]))
-      .attr("r", d => r(d['contig_length']));
 
     // transition x axis label
     svg.select('.label--x')
@@ -158,8 +199,17 @@ d3.tsv(tsvFile).then(data => {
 
   function updateY() {
     let field = this.value;
-    y.domain(d3.extent(data, d => d[field]))
-      .nice();
+    if (field === 'contig_length') {
+      y = d3.scaleLog()
+        .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+        .range([height, 0])
+        .nice();
+    } else {
+      y = d3.scaleLinear()
+        .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+        .range([height, 0])
+        .nice();
+    }
 
     // transition x axis
     gyAxis.transition()
@@ -180,6 +230,38 @@ d3.tsv(tsvFile).then(data => {
   // Event Listeners for Changing axes
   d3.select("#choices_graphics_2d_x").on("change", updateX);
   d3.select("#choices_graphics_2d_y").on("change", updateY);
+
+  // update circle colors on change
+  function updateColors() {
+    let field = this.value;
+
+    svg.selectAll('circle')
+      .transition()
+      .attr("fill", d => color(d[getChosenCircleColor()]));
+  }
+  d3.select("#choices_graphics_2d_circle_color").on("change", updateColors);
+
+  // update circle radius on change
+  function updateRadius() {
+    let field = this.value;
+    if (field === "contig_length") {
+      radius = d3.scaleLog()
+        .domain(d3.extent(data, d => d[getChosenRadius()]))
+        .range([5, 25]);
+    } else {
+      radius = d3.scaleLinear()
+        .domain(d3.extent(data, d => d[getChosenRadius()]))
+        .range([5, 25]);
+    }
+
+    radius.domain(d3.extent(data, d => d[field]));
+
+    svg.selectAll('circle')
+      .transition()
+      .duration(750)
+      .attr("r", d => radius(d[getChosenRadius()]));
+  }
+  d3.select("#choices_graphics_2d_circle_radius").on("change", updateRadius);
 
   function zoomFunction() {
 
