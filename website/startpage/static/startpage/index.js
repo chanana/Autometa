@@ -46,13 +46,13 @@ d3.tsv(tsvFile).then(data => {
 
   // parse data
   data.forEach(function (d) {
-    d.completeness = +d.completeness;
-    d.purity = +d.purity;
+    // d.completeness = +d.completeness;
+    // d.purity = +d.purity;
     d.x = +d.x;
     d.y = +d.y;
     d.contig_length = +d.contig_length;
     d.coverage = +d.coverage;
-    d.gc = +d.GC;
+    // d.gc = +d.GC;
   });
 
   // init x scale
@@ -97,7 +97,8 @@ d3.tsv(tsvFile).then(data => {
 
   var tip = d3.tip()
     .attr('class', 'd3-tip')
-    .html(function (d) { return "Contig: " + d['contig'] + "<br>Cluster: " + d['cluster'] });
+    .html(function (d) { return "Cluster: " + d['cluster'] });
+  // .html(function (d) { return "Contig: " + d['contig'] + "<br>Cluster: " + d['cluster'] });
 
   //zoom stuff
   var zoom = d3.zoom()

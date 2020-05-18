@@ -3,6 +3,7 @@ autometaDashboard.gif
 autometaDashboard.pdf
 d3/
 
+
 ## Taken from: https://github.com/github/gitignore/blob/master/Node.gitignore
 #Logs
 logs
@@ -334,6 +335,8 @@ dmypy.json
 .pyre/
 
 ## Autometa specifics
+massive.tsv
+subsetOfMassive.tsv
 master.json
 master.tsv
 *log
