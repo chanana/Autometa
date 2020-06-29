@@ -3,7 +3,6 @@ var chartBox = document.querySelector("#graphics_2d");
 
 const chartBoxWidth = chartBox.getBoundingClientRect().width;
 
-
 var margin = {
   top: 0.1 * chartBoxWidth,
   right: 0.1 * chartBoxWidth,
@@ -333,4 +332,104 @@ d3.tsv(tsvFile).then(data => {
     }
     tooltipToggle.node().innerText = "Tooltips are " + (tooltipsEnabled ? 'enabled' : 'disabled');
   }
+
+  //
+  //hexbin functionality
+  //
+
+  var radius_hb = 20; // radius in px
+  var hexbin = d3.hexbin()
+    .x(d => x(d.x))
+    .y(d => y(d.y))
+    .radius(radius_hb * width / height)
+    .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
+
+  var bins = hexbin(data);
+
+  // use only the x and y axis for hexbin visuals (for now perhaps)
+
+  var x_hb = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.x))
+    .rangeRound([0, width])
+
+  var y_hb = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.y))
+    .rangeRound([height, 0])
+
+  var xAxis_hb = d3.axisBottom(x_hb);
+  var yAxis_hb = d3.axisLeft(y_hb);
+
+  // var xAxis_hb = g => g
+  //   .attr("transform", `translate(0,${height - margin.bottom})`)
+  //   .call(d3.axisBottom(x_hb).ticks(width / 80, ""))
+  //   .call(g => g.select(".domain").remove())
+  //   .call(g => g.append("text")
+  //     .attr("x", width - margin.right)
+  //     .attr("y", -4)
+  //     .attr("fill", "currentColor")
+  //     .attr("font-weight", "bold")
+  //     .attr("text-anchor", "end")
+  //     .text(data.x))
+
+  // var yAxis_hb = g => g
+  //   .attr("transform", `translate(${margin.left},0)`)
+  //   .call(d3.axisLeft(y_hb).ticks(null, ".1s"))
+  //   .call(g => g.select(".domain").remove())
+  //   .call(g => g.append("text")
+  //     .attr("x", 4)
+  //     .attr("y", margin.top)
+  //     .attr("dy", ".71em")
+  //     .attr("fill", "currentColor")
+  //     .attr("font-weight", "bold")
+  //     .attr("text-anchor", "start")
+  //     .text(data.y))
+
+  var color_hb = d3.scaleSequential(d3.interpolateBuPu)
+    .domain([0, d3.max(bins, d => d.length) / 2])
+
+  var svg_hb = d3.select("#graphics_hexbin")
+    .append("svg")
+    .attr("width", chartBoxWidth)
+    .attr("height", chartBoxWidth)
+    .attr("fill", "transparent")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  var gxAxis_hb = svg_hb.append("g")
+    .attr("class", "axis_hb axis_hb--x")
+    .attr("transform", `translate(0, ${height})`)
+    .call(xAxis_hb)
+
+  svg_hb.append("text")
+    .attr("class", "label_hb--x")
+    .attr("transform", `translate(${width / 2}, ${margin.top / 2 + height})`)
+    .attr('text-anchor', 'middle')
+    .attr("fill", "#000")
+    .text(data.x);
+
+  var gyAxis_hb = svg_hb.append("g")
+    .attr("class", "axis_hb axis_hb--y")
+    .call(yAxis_hb);
+
+  svg_hb.append("text")
+    .attr("class", "label_hb--y")
+    .attr('transform', `translate(${-margin.left / 2}, ${height / 2}) rotate(-90)`)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#000')
+    .text(data.y);
+
+  // svg_hb.append("g")
+  //   .call(xAxis_hb);
+
+  // svg_hb.append("g")
+  //   .call(yAxis_hb);
+
+  svg_hb.append("g")
+    // .attr("stroke", "#000")
+    // .attr("stroke-opacity", 0.1)
+    .selectAll("path")
+    .data(bins)
+    .join("path")
+    .attr("d", hexbin.hexagon())
+    .attr("transform", d => `translate(${d.x},${d.y})`)
+    .attr("fill", d => color_hb(d.length));
 });
