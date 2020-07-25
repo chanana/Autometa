@@ -54,6 +54,119 @@ d3.tsv(tsvFile).then(data => {
     // d.gc = +d.GC;
   });
 
+  // ----------------------
+  // convex hull
+  // ----------------------
+  // setup axes
+  var xHull = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.x))
+    .range([0, width])
+    .nice();
+
+  var yHull = d3.scaleLinear()
+    .domain(d3.extent(data, d => d.y))
+    .range([height, 0])
+    .nice();
+
+  // color
+  var color = d3.scaleOrdinal()
+    .range(d3.schemeTableau10);
+
+  // //zoom stuff
+  // var zoomHull = d3.zoom()
+  //   .scaleExtent([1, 50])
+  //   .extent([[0, 0], [width, height]])
+  //   .on("zoom", zoomFunctionHull);
+
+  // init x axis
+  var xHullAxis = d3.axisBottom(xHull);
+  var yHullAxis = d3.axisLeft(yHull);
+
+  // draw svg box
+  var svgHull = d3.select("#graphics_convex_hull")
+    .append("svg")
+    .attr("width", chartBoxWidth)
+    .attr("height", chartBoxWidth)
+    .attr("fill", "transparent")
+    .append("g")
+    // .attr("class", "zoomOnThisElementHull")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  svgHull.append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+  var gxHullAxis = svgHull.append("g")
+    .attr("class", "axisHull axis--x")
+    .attr("transform", `translate(0, ${height})`)
+    .call(xHullAxis)
+
+  svgHull.append("text")
+    .attr("class", "label--x")
+    .attr("transform", `translate(${width / 2}, ${margin.top / 2 + height})`)
+    .attr('text-anchor', 'middle')
+    .attr("fill", "#000")
+    .text("BH-tSNE X");
+
+  var gyHullAxis = svgHull.append("g")
+    .attr("class", "axisHull axis--y")
+    .call(yHullAxis);
+
+  svgHull.append("text")
+    .attr("class", "label--y")
+    .attr('transform', `translate(${-margin.left / 2}, ${height / 2}) rotate(-90)`)
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#000')
+    .text("BH-tSNE Y");
+
+  var poly = svgHull.append('svg')
+    .attr("class", "poly")
+    .attr("width", width)
+    .attr("height", height);
+
+  var points, hull, line;
+
+  var dataByCluster = d3.nest().key(d => d.cluster).entries(data)
+  dataByCluster.forEach(d => {
+    console.log(d)
+    if (d.key === "") {
+      return
+    }
+    if (d.values.length < 3) { // convex hull for less than three points doesn't exist  
+      return
+    }
+
+    // each d contains a key (binXXXX) and values (array of objects)
+    points = d.values.map(d => [xHull(d.x), yHull(d.y)]);
+    hull = d3.polygonHull(points);
+    // console.log(hull) // each hull is an array of [x, y] point pairs i.e. an array of two element arrays
+    line = d3.line()
+      .curve(d3.curveLinearClosed);
+
+    poly.append("path")
+      .attr("d", line(hull))
+      .attr("stroke", color(d.key))
+      .attr("fill", color(d.key))
+      .attr("fill-opacity", 0.1)
+      .attr("data-clusterkey", d.key)
+      .on("mouseover", () => event.target.setAttribute('fill-opacity', 0.7))
+      .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.1))
+      .on("click", getData)
+
+    // https://observablehq.com/@d3/zoom-to-bounding-box Possible code to look at for
+    // bounding box based zoom i.e. click on a path and it'll zoom to that path in focus
+    // and center of screen
+  });
+
+
+  // ------------------------------------------------------------------------------------------
+  // Clicked Graph
+  // ------------------------------------------------------------------------------------------
+  function getData() {
+    console.log(event.target.getAttribute("data-clusterkey"));
+  };
+
+  // old code to be brought into draw graph in some way
   // init x scale
   if (getChosenXAxis().value === "contig_length") {
     var x = d3.scaleLog()
@@ -90,9 +203,6 @@ d3.tsv(tsvFile).then(data => {
       .domain(d3.extent(data, d => d[getChosenRadius()]))
       .range([5, 25]);
   }
-
-  var color = d3.scaleOrdinal()
-    .range(d3.schemeTableau10);
 
   var tip = d3.tip()
     .attr('class', 'd3-tip')
@@ -333,103 +443,4 @@ d3.tsv(tsvFile).then(data => {
     tooltipToggle.node().innerText = "Tooltips are " + (tooltipsEnabled ? 'enabled' : 'disabled');
   }
 
-  //
-  //hexbin functionality
-  //
-
-  var radius_hb = 20; // radius in px
-  var hexbin = d3.hexbin()
-    .x(d => x(d.x))
-    .y(d => y(d.y))
-    .radius(radius_hb * width / height)
-    .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
-
-  var bins = hexbin(data);
-
-  // use only the x and y axis for hexbin visuals (for now perhaps)
-
-  var x_hb = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.x))
-    .rangeRound([0, width])
-
-  var y_hb = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.y))
-    .rangeRound([height, 0])
-
-  var xAxis_hb = d3.axisBottom(x_hb);
-  var yAxis_hb = d3.axisLeft(y_hb);
-
-  // var xAxis_hb = g => g
-  //   .attr("transform", `translate(0,${height - margin.bottom})`)
-  //   .call(d3.axisBottom(x_hb).ticks(width / 80, ""))
-  //   .call(g => g.select(".domain").remove())
-  //   .call(g => g.append("text")
-  //     .attr("x", width - margin.right)
-  //     .attr("y", -4)
-  //     .attr("fill", "currentColor")
-  //     .attr("font-weight", "bold")
-  //     .attr("text-anchor", "end")
-  //     .text(data.x))
-
-  // var yAxis_hb = g => g
-  //   .attr("transform", `translate(${margin.left},0)`)
-  //   .call(d3.axisLeft(y_hb).ticks(null, ".1s"))
-  //   .call(g => g.select(".domain").remove())
-  //   .call(g => g.append("text")
-  //     .attr("x", 4)
-  //     .attr("y", margin.top)
-  //     .attr("dy", ".71em")
-  //     .attr("fill", "currentColor")
-  //     .attr("font-weight", "bold")
-  //     .attr("text-anchor", "start")
-  //     .text(data.y))
-
-  var color_hb = d3.scaleSequential(d3.interpolateBuPu)
-    .domain([0, d3.max(bins, d => d.length) / 2])
-
-  var svg_hb = d3.select("#graphics_hexbin")
-    .append("svg")
-    .attr("width", chartBoxWidth)
-    .attr("height", chartBoxWidth)
-    .attr("fill", "transparent")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-  var gxAxis_hb = svg_hb.append("g")
-    .attr("class", "axis_hb axis_hb--x")
-    .attr("transform", `translate(0, ${height})`)
-    .call(xAxis_hb)
-
-  svg_hb.append("text")
-    .attr("class", "label_hb--x")
-    .attr("transform", `translate(${width / 2}, ${margin.top / 2 + height})`)
-    .attr('text-anchor', 'middle')
-    .attr("fill", "#000")
-    .text(data.x);
-
-  var gyAxis_hb = svg_hb.append("g")
-    .attr("class", "axis_hb axis_hb--y")
-    .call(yAxis_hb);
-
-  svg_hb.append("text")
-    .attr("class", "label_hb--y")
-    .attr('transform', `translate(${-margin.left / 2}, ${height / 2}) rotate(-90)`)
-    .attr('text-anchor', 'middle')
-    .attr('fill', '#000')
-    .text(data.y);
-
-  // svg_hb.append("g")
-  //   .call(xAxis_hb);
-
-  // svg_hb.append("g")
-  //   .call(yAxis_hb);
-
-  svg_hb.append("g")
-    // .attr("stroke", "#000")
-    // .attr("stroke-opacity", 0.1)
-    .selectAll("path")
-    .data(bins)
-    .join("path")
-    .attr("d", hexbin.hexagon())
-    .attr("transform", d => `translate(${d.x},${d.y})`)
-    .attr("fill", d => color_hb(d.length));
 });
