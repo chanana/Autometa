@@ -59,13 +59,19 @@
                     <!-- <option value="gc">GC %</option> -->
                 </select>
             </div>
-            <div class="col-md-4 text-center">
+            <div class="col-md-2 text-center" id="info">
                 <b>Toggles</b><br>
                 <button id="zoom_toggle" class="btn btn-primary">Toggle zoom</button><br>
                 <button id="zoom_reset" class="btn btn-primary">Reset zoom</button><br>
                 <button id="tooltip_toggle" class="btn btn-primary">Toggle Tooltips</button>
+
                 <!-- <button id="zoom_toggle_hull" class="btn btn-primary">Toggle zoom hull</button><br>
                 <button id="zoom_reset_hull" class="btn btn-primary">Reset zoom hull</button><br> -->
+            </div>
+            <div class="col-md-2 text-center" id="info">
+                <b>Selected Cluster</b>
+                <output id="output"></output><br>
+                <select id="cluster-selection"></select>
             </div>
         </div>
         <div class="row">

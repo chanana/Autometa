@@ -41,22 +41,21 @@ const getChosenRadius = function () {
 // var yTipLabel = "Purity: ";
 
 // Retrieve data from the TSV file and execute everything below
-d3.tsv(tsvFile).then(data => {
-
-  // parse data
-  data.forEach(function (d) {
-    // d.completeness = +d.completeness;
-    // d.purity = +d.purity;
-    d.x = +d.x;
-    d.y = +d.y;
-    d.contig_length = +d.contig_length;
-    d.coverage = +d.coverage;
-    // d.gc = +d.GC;
-  });
-
-  // ----------------------
-  // convex hull
-  // ----------------------
+d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
+  // https://stackoverflow.com/a/50519586
+  row.x = +row.x
+  row.y = +row.y
+  row.contig_length = +row.contig_length
+  row.coverage = +row.coverage
+  //   // d.completeness = +d.completeness;
+  //   // d.purity = +d.purity;
+  //   // d.gc = +d.GC;
+  return row
+}).then(data => {
+  // recieves an array of rows with a property "columns" which is an array of the original column names
+  // ----------------------------------------------------------------------------------------
+  // convex hull code
+  // ----------------------------------------------------------------------------------------
   // setup axes
   var xHull = d3.scaleLinear()
     .domain(d3.extent(data, d => d.x))
@@ -127,8 +126,110 @@ d3.tsv(tsvFile).then(data => {
   var points, hull, line;
 
   var dataByCluster = d3.nest().key(d => d.cluster).entries(data)
+  // dataByCluster is an array of objects each containing property "key" with the
+  // cluster and a "values" which is an array of (objects) rows from that cluster 
+
+  console.log(data)
+  const drawGraph = () => {// receives default "event" which has a "target" containing various attributes
+    var clickedData = dataByCluster.filter(d => d.key === event.target.id)[0].values;
+    console.log(clickedData)
+    // ------------------------------------------------------------------------------------------
+    // Clicked Graph
+    // ------------------------------------------------------------------------------------------
+
+    // destroy old graph if that exists
+    d3.selectAll(".clickedData").remove()
+
+    // init x scale
+    if (getChosenXAxis().value === "contig_length") {
+      var x = d3.scaleLog()
+        .domain(d3.extent(clickedData, d => d[getChosenXAxis().value]))
+        .range([0, width])
+        .nice();
+    } else {
+      var x = d3.scaleLinear()
+        .domain(d3.extent(clickedData, d => d[getChosenXAxis().value]))
+        .range([0, width])
+        .nice();
+    }
+
+    // init y scale
+    if (getChosenYAxis().value === "contig_length") {
+      var y = d3.scaleLog()
+        .domain(d3.extent(clickedData, d => d[getChosenYAxis().value]))
+        .range([height, 0])
+        .nice();
+    } else {
+      var y = d3.scaleLinear()
+        .domain(d3.extent(clickedData, d => d[getChosenYAxis().value]))
+        .range([height, 0])
+        .nice();
+    }
+
+    // init r scale
+    if (getChosenRadius() === "contig_length") {
+      var radius = d3.scaleLog()
+        .domain(d3.extent(clickedData, d => d[getChosenRadius()]))
+        .range([5, 25]);
+    } else {
+      var radius = d3.scaleLinear()
+        .domain(d3.extent(clickedData, d => d[getChosenRadius()]))
+        .range([5, 25]);
+    }
+
+    // init x axis
+    var xAxis = d3.axisBottom(x);
+    var yAxis = d3.axisLeft(y);
+
+    // Create an SVG wrapper, append an SVG group that will hold our chart,
+    // and shift the latter by left and top margins.
+    var svg = d3.select("#graphics_2d")
+      .append("svg")
+      .attr("id", clickedData[0].cluster)
+      .attr("class", "clickedData")
+      .attr("width", chartBoxWidth)
+      .attr("height", chartBoxWidth)
+      .attr("fill", "transparent")
+      .append("g")
+      .attr("class", "zoomOnThisElement")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    // svg.call(tip);
+
+    svg.append("rect")
+      .attr("width", width)
+      .attr("height", height);
+
+    var gxAxis = svg.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", `translate(0, ${height})`)
+      .call(xAxis)
+
+    svg.append("text")
+      .attr("class", "label--x")
+      .attr("transform", `translate(${width / 2}, ${margin.top / 2 + height})`)
+      .attr('text-anchor', 'middle')
+      .attr("fill", "#000")
+      .text(getChosenXAxis().text);
+
+    var gyAxis = svg.append("g")
+      .attr("class", "axis axis--y")
+      .call(yAxis);
+
+    svg.append("text")
+      .attr("class", "label--y")
+      .attr('transform', `translate(${-margin.left / 2}, ${height / 2}) rotate(-90)`)
+      .attr('text-anchor', 'middle')
+      .attr('fill', '#000')
+      .text(getChosenYAxis().text);
+  }
+
   dataByCluster.forEach(d => {
-    console.log(d)
+    d3.select("#cluster-selection")
+      .append("option")
+      .text(d.key)
+      .attr("value", d.key)
+
     if (d.key === "") {
       return
     }
@@ -148,299 +249,302 @@ d3.tsv(tsvFile).then(data => {
       .attr("stroke", color(d.key))
       .attr("fill", color(d.key))
       .attr("fill-opacity", 0.1)
-      .attr("data-clusterkey", d.key)
+      .attr("id", d.key)
       .on("mouseover", () => event.target.setAttribute('fill-opacity', 0.7))
       .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.1))
-      .on("click", getData)
+      .on("click", drawGraph)
 
     // https://observablehq.com/@d3/zoom-to-bounding-box Possible code to look at for
     // bounding box based zoom i.e. click on a path and it'll zoom to that path in focus
     // and center of screen
   });
 
-
-  // ------------------------------------------------------------------------------------------
-  // Clicked Graph
-  // ------------------------------------------------------------------------------------------
-  function getData() {
-    console.log(event.target.getAttribute("data-clusterkey"));
-  };
-
-  // old code to be brought into draw graph in some way
-  // init x scale
-  if (getChosenXAxis().value === "contig_length") {
-    var x = d3.scaleLog()
-      .domain(d3.extent(data, d => d[getChosenXAxis().value]))
-      .range([0, width])
-      .nice();
-  } else {
-    var x = d3.scaleLinear()
-      .domain(d3.extent(data, d => d[getChosenXAxis().value]))
-      .range([0, width])
-      .nice();
+  const getChosenCluster = function () {
+    let e = document.getElementById("cluster-selection");
+    return {
+      value: e.value,
+      text: e.options[e.selectedIndex].text
+    };
   }
 
-  // init y scale
-  if (getChosenYAxis().value === "contig_length") {
-    var y = d3.scaleLog()
-      .domain(d3.extent(data, d => d[getChosenYAxis().value]))
-      .range([height, 0])
-      .nice();
-  } else {
-    var y = d3.scaleLinear()
-      .domain(d3.extent(data, d => d[getChosenYAxis().value]))
-      .range([height, 0])
-      .nice();
-  }
 
-  // init r scale
-  if (getChosenRadius() === "contig_length") {
-    var radius = d3.scaleLog()
-      .domain(d3.extent(data, d => d[getChosenRadius()]))
-      .range([5, 25]);
-  } else {
-    var radius = d3.scaleLinear()
-      .domain(d3.extent(data, d => d[getChosenRadius()]))
-      .range([5, 25]);
-  }
+  // // ------------------------------------------------------------------------------------------
+  // // Clicked Graph
+  // // ------------------------------------------------------------------------------------------
+  // // init x scale
+  // if (getChosenXAxis().value === "contig_length") {
+  //   var x = d3.scaleLog()
+  //     .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+  //     .range([0, width])
+  //     .nice();
+  // } else {
+  //   var x = d3.scaleLinear()
+  //     .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+  //     .range([0, width])
+  //     .nice();
+  // }
 
-  var tip = d3.tip()
-    .attr('class', 'd3-tip')
-    .html(function (d) { return "Cluster: " + d['cluster'] });
-  // .html(function (d) { return "Contig: " + d['contig'] + "<br>Cluster: " + d['cluster'] });
+  // // init y scale
+  // if (getChosenYAxis().value === "contig_length") {
+  //   var y = d3.scaleLog()
+  //     .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+  //     .range([height, 0])
+  //     .nice();
+  // } else {
+  //   var y = d3.scaleLinear()
+  //     .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+  //     .range([height, 0])
+  //     .nice();
+  // }
 
-  //zoom stuff
-  var zoom = d3.zoom()
-    .scaleExtent([1, 50])
-    .extent([[0, 0], [width, height]])
-    .on("zoom", zoomFunction);
+  // // init r scale
+  // if (getChosenRadius() === "contig_length") {
+  //   var radius = d3.scaleLog()
+  //     .domain(d3.extent(data, d => d[getChosenRadius()]))
+  //     .range([5, 25]);
+  // } else {
+  //   var radius = d3.scaleLinear()
+  //     .domain(d3.extent(data, d => d[getChosenRadius()]))
+  //     .range([5, 25]);
+  // }
 
-  // init x axis
-  var xAxis = d3.axisBottom(x);
-  var yAxis = d3.axisLeft(y);
+  // var tip = d3.tip()
+  //   .attr('class', 'd3-tip')
+  //   .html(function (d) { return "Cluster: " + d['cluster'] });
+  // // .html(function (d) { return "Contig: " + d['contig'] + "<br>Cluster: " + d['cluster'] });
 
-  // Create an SVG wrapper, append an SVG group that will hold our chart,
-  // and shift the latter by left and top margins.
-  var svg = d3.select("#graphics_2d")
-    .append("svg")
-    .attr("width", chartBoxWidth)
-    .attr("height", chartBoxWidth)
-    .attr("fill", "transparent")
-    .append("g")
-    .attr("class", "zoomOnThisElement")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+  // //zoom stuff
+  // var zoom = d3.zoom()
+  //   .scaleExtent([1, 50])
+  //   .extent([[0, 0], [width, height]])
+  //   .on("zoom", zoomFunction);
 
-  svg.call(tip);
+  // // init x axis
+  // var xAxis = d3.axisBottom(x);
+  // var yAxis = d3.axisLeft(y);
 
-  svg.append("rect")
-    .attr("width", width)
-    .attr("height", height);
+  // // Create an SVG wrapper, append an SVG group that will hold our chart,
+  // // and shift the latter by left and top margins.
+  // var svg = d3.select("#graphics_2d")
+  //   .append("svg")
+  //   .attr("width", chartBoxWidth)
+  //   .attr("height", chartBoxWidth)
+  //   .attr("fill", "transparent")
+  //   .append("g")
+  //   .attr("class", "zoomOnThisElement")
+  //   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-  var gxAxis = svg.append("g")
-    .attr("class", "axis axis--x")
-    .attr("transform", `translate(0, ${height})`)
-    .call(xAxis)
+  // svg.call(tip);
 
-  svg.append("text")
-    .attr("class", "label--x")
-    .attr("transform", `translate(${width / 2}, ${margin.top / 2 + height})`)
-    .attr('text-anchor', 'middle')
-    .attr("fill", "#000")
-    .text(getChosenXAxis().text);
+  // svg.append("rect")
+  //   .attr("width", width)
+  //   .attr("height", height);
 
-  var gyAxis = svg.append("g")
-    .attr("class", "axis axis--y")
-    .call(yAxis);
+  // var gxAxis = svg.append("g")
+  //   .attr("class", "axis axis--x")
+  //   .attr("transform", `translate(0, ${height})`)
+  //   .call(xAxis)
 
-  svg.append("text")
-    .attr("class", "label--y")
-    .attr('transform', `translate(${-margin.left / 2}, ${height / 2}) rotate(-90)`)
-    .attr('text-anchor', 'middle')
-    .attr('fill', '#000')
-    .text(getChosenYAxis().text);
+  // svg.append("text")
+  //   .attr("class", "label--x")
+  //   .attr("transform", `translate(${width / 2}, ${margin.top / 2 + height})`)
+  //   .attr('text-anchor', 'middle')
+  //   .attr("fill", "#000")
+  //   .text(getChosenXAxis().text);
 
-  var scatter = svg.append('svg')
-    .attr("class", "scatter")
-    .attr("width", width)
-    .attr("height", height);
+  // var gyAxis = svg.append("g")
+  //   .attr("class", "axis axis--y")
+  //   .call(yAxis);
 
-  scatter.selectAll("dot")
-    .data(data)
-    .enter().append("circle")
-    .attr("class", "dot")
-    .attr("cx", d => x(d[getChosenXAxis().value]))
-    .attr("cy", d => y(d[getChosenYAxis().value]))
-    .attr("r", d => radius(d[getChosenRadius()]))
-    .attr("fill", d => color(d[getChosenCircleColor()]))
-    .attr("opacity", ".5")
+  // svg.append("text")
+  //   .attr("class", "label--y")
+  //   .attr('transform', `translate(${-margin.left / 2}, ${height / 2}) rotate(-90)`)
+  //   .attr('text-anchor', 'middle')
+  //   .attr('fill', '#000')
+  //   .text(getChosenYAxis().text);
 
-  // update x axis
-  function updateX() {
-    let field = this.value;
-    if (field === 'contig_length') {
-      x = d3.scaleLog()
-        .domain(d3.extent(data, d => d[getChosenXAxis().value]))
-        .range([0, width])
-        .nice();
-    } else {
-      x = d3.scaleLinear()
-        .domain(d3.extent(data, d => d[getChosenXAxis().value]))
-        .range([0, width])
-        .nice();
-    }
-    // reset the zoom state so that the zoom event understands that you are no longer zoomed.
-    resetZoom();
+  // var scatter = svg.append('svg')
+  //   .attr("class", "scatter")
+  //   .attr("width", width)
+  //   .attr("height", height);
 
-    // transition x axis
-    gxAxis.transition()
-      .duration(750)
-      .call(xAxis.scale(x));
+  // scatter.selectAll("dot")
+  //   .data(data)
+  //   .enter().append("circle")
+  //   .attr("class", "dot")
+  //   .attr("cx", d => x(d[getChosenXAxis().value]))
+  //   .attr("cy", d => y(d[getChosenYAxis().value]))
+  //   .attr("r", d => radius(d[getChosenRadius()]))
+  //   .attr("fill", d => color(d[getChosenCircleColor()]))
+  //   .attr("opacity", ".5")
 
-    // transition circles
-    svg.selectAll('circle')
-      .data(data)
-      .transition()
-      .duration(750)
-      .attr("cx", d => x(d[field]))
-      .attr("cy", d => y(d[getChosenYAxis().value]))
+  // // update x axis
+  // function updateX() {
+  //   let field = this.value;
+  //   if (field === 'contig_length') {
+  //     x = d3.scaleLog()
+  //       .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+  //       .range([0, width])
+  //       .nice();
+  //   } else {
+  //     x = d3.scaleLinear()
+  //       .domain(d3.extent(data, d => d[getChosenXAxis().value]))
+  //       .range([0, width])
+  //       .nice();
+  //   }
+  //   // reset the zoom state so that the zoom event understands that you are no longer zoomed.
+  //   resetZoom();
 
-    // transition x axis label
-    svg.select('.label--x')
-      .text(getChosenXAxis().text);
-  }
+  //   // transition x axis
+  //   gxAxis.transition()
+  //     .duration(750)
+  //     .call(xAxis.scale(x));
 
-  function updateY() {
-    let field = this.value;
-    if (field === 'contig_length') {
-      y = d3.scaleLog()
-        .domain(d3.extent(data, d => d[getChosenYAxis().value]))
-        .range([height, 0])
-        .nice();
-    } else {
-      y = d3.scaleLinear()
-        .domain(d3.extent(data, d => d[getChosenYAxis().value]))
-        .range([height, 0])
-        .nice();
-    }
-    // reset the zoom state so that the zoom event understands that you are no longer zoomed.
-    resetZoom();
+  //   // transition circles
+  //   svg.selectAll('circle')
+  //     .data(data)
+  //     .transition()
+  //     .duration(750)
+  //     .attr("cx", d => x(d[field]))
+  //     .attr("cy", d => y(d[getChosenYAxis().value]))
 
-    // transition x axis
-    gyAxis.transition()
-      .duration(750)
-      .call(yAxis.scale(y));
+  //   // transition x axis label
+  //   svg.select('.label--x')
+  //     .text(getChosenXAxis().text);
+  // }
 
-    svg.selectAll('circle')
-      .data(data)
-      .transition()
-      .duration(750)
-      .attr("cx", d => x(d[getChosenXAxis().value]))
-      .attr("cy", d => y(d[field]));
+  // function updateY() {
+  //   let field = this.value;
+  //   if (field === 'contig_length') {
+  //     y = d3.scaleLog()
+  //       .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+  //       .range([height, 0])
+  //       .nice();
+  //   } else {
+  //     y = d3.scaleLinear()
+  //       .domain(d3.extent(data, d => d[getChosenYAxis().value]))
+  //       .range([height, 0])
+  //       .nice();
+  //   }
+  //   // reset the zoom state so that the zoom event understands that you are no longer zoomed.
+  //   resetZoom();
 
-    // transition x axis label
-    svg.select('.label--y')
-      .text(getChosenYAxis().text);
-  }
-  // Event Listeners for Changing axes
-  d3.select("#choices_graphics_2d_x").on("change", updateX);
-  d3.select("#choices_graphics_2d_y").on("change", updateY);
+  //   // transition x axis
+  //   gyAxis.transition()
+  //     .duration(750)
+  //     .call(yAxis.scale(y));
 
-  // update circle colors on change
-  function updateColors() {
-    let field = this.value;
+  //   svg.selectAll('circle')
+  //     .data(data)
+  //     .transition()
+  //     .duration(750)
+  //     .attr("cx", d => x(d[getChosenXAxis().value]))
+  //     .attr("cy", d => y(d[field]));
 
-    svg.selectAll('circle')
-      .transition()
-      .attr("fill", d => color(d[getChosenCircleColor()]));
-  }
-  d3.select("#choices_graphics_2d_circle_color").on("change", updateColors);
+  //   // transition x axis label
+  //   svg.select('.label--y')
+  //     .text(getChosenYAxis().text);
+  // }
+  // // Event Listeners for Changing axes
+  // d3.select("#choices_graphics_2d_x").on("change", updateX);
+  // d3.select("#choices_graphics_2d_y").on("change", updateY);
 
-  // update circle radius on change
-  function updateRadius() {
-    let field = this.value;
-    if (field === "contig_length") {
-      radius = d3.scaleLog()
-        .domain(d3.extent(data, d => d[getChosenRadius()]))
-        .range([5, 25]);
-    } else {
-      radius = d3.scaleLinear()
-        .domain(d3.extent(data, d => d[getChosenRadius()]))
-        .range([5, 25]);
-    }
+  // // update circle colors on change
+  // function updateColors() {
+  //   let field = this.value;
 
-    radius.domain(d3.extent(data, d => d[field]));
+  //   svg.selectAll('circle')
+  //     .transition()
+  //     .attr("fill", d => color(d[getChosenCircleColor()]));
+  // }
+  // d3.select("#choices_graphics_2d_circle_color").on("change", updateColors);
 
-    svg.selectAll('circle')
-      .transition()
-      .duration(750)
-      .attr("r", d => radius(d[getChosenRadius()]));
-  }
-  d3.select("#choices_graphics_2d_circle_radius").on("change", updateRadius);
+  // // update circle radius on change
+  // function updateRadius() {
+  //   let field = this.value;
+  //   if (field === "contig_length") {
+  //     radius = d3.scaleLog()
+  //       .domain(d3.extent(data, d => d[getChosenRadius()]))
+  //       .range([5, 25]);
+  //   } else {
+  //     radius = d3.scaleLinear()
+  //       .domain(d3.extent(data, d => d[getChosenRadius()]))
+  //       .range([5, 25]);
+  //   }
 
-  function zoomFunction() {
+  //   radius.domain(d3.extent(data, d => d[field]));
 
-    // recover the new scale
-    var newX = d3.event.transform.rescaleX(x);
-    var newY = d3.event.transform.rescaleY(y);
+  //   svg.selectAll('circle')
+  //     .transition()
+  //     .duration(750)
+  //     .attr("r", d => radius(d[getChosenRadius()]));
+  // }
+  // d3.select("#choices_graphics_2d_circle_radius").on("change", updateRadius);
 
-    // update axes with these new boundaries
-    gxAxis.call(xAxis.scale(newX));
-    gyAxis.call(yAxis.scale(newY));
+  // function zoomFunction() {
 
-    // update circle position
-    scatter.selectAll("circle")
-      .attr('cx', d => newX(d[getChosenXAxis().value]))
-      .attr('cy', d => newY(d[getChosenYAxis().value]))
-  }
+  //   // recover the new scale
+  //   var newX = d3.event.transform.rescaleX(x);
+  //   var newY = d3.event.transform.rescaleY(y);
 
-  // zoom toggle functionality; https://stackoverflow.com/a/29762389/9206532
-  var zoomEnabled;
+  //   // update axes with these new boundaries
+  //   gxAxis.call(xAxis.scale(newX));
+  //   gyAxis.call(yAxis.scale(newY));
 
-  var zoomToggle = d3.select("#zoom_toggle")
-    .on("click", toggleZoom);
+  //   // update circle position
+  //   scatter.selectAll("circle")
+  //     .attr('cx', d => newX(d[getChosenXAxis().value]))
+  //     .attr('cy', d => newY(d[getChosenYAxis().value]))
+  // }
 
-  function toggleZoom() {
-    zoomEnabled = !zoomEnabled;
-    if (zoomEnabled) {
-      d3.select(".zoomOnThisElement")
-        .call(zoom);
-      console.log(zoomEnabled)
-    } else {
-      d3.select(".zoomOnThisElement")
-        .on(".zoom", null)
-      console.log(zoomEnabled)
-    }
-    zoomToggle.node().innerText = 'Zoom is ' + (zoomEnabled ? 'enabled' : 'disabled');
-  }
+  // // zoom toggle functionality; https://stackoverflow.com/a/29762389/9206532
+  // var zoomEnabled;
 
-  // zoom reset button
-  // https://observablehq.com/@d3/programmatic-zoom
-  // https://github.com/d3/d3-zoom/issues/107
-  d3.select("#zoom_reset").on("click", resetZoom);
-  function resetZoom() {
-    d3.select(".zoomOnThisElement")
-      .transition()
-      .duration(750)
-      .call(zoom.transform, d3.zoomIdentity)
-  }
+  // var zoomToggle = d3.select("#zoom_toggle")
+  //   .on("click", toggleZoom);
 
-  var tooltipsEnabled;
+  // function toggleZoom() {
+  //   zoomEnabled = !zoomEnabled;
+  //   if (zoomEnabled) {
+  //     d3.select(".zoomOnThisElement")
+  //       .call(zoom);
+  //     console.log(zoomEnabled)
+  //   } else {
+  //     d3.select(".zoomOnThisElement")
+  //       .on(".zoom", null)
+  //     console.log(zoomEnabled)
+  //   }
+  //   zoomToggle.node().innerText = 'Zoom is ' + (zoomEnabled ? 'enabled' : 'disabled');
+  // }
 
-  var tooltipToggle = d3.select("#tooltip_toggle")
-    .on("click", toggleTooltips);
+  // // zoom reset button
+  // // https://observablehq.com/@d3/programmatic-zoom
+  // // https://github.com/d3/d3-zoom/issues/107
+  // d3.select("#zoom_reset").on("click", resetZoom);
+  // function resetZoom() {
+  //   d3.select(".zoomOnThisElement")
+  //     .transition()
+  //     .duration(750)
+  //     .call(zoom.transform, d3.zoomIdentity)
+  // }
 
-  function toggleTooltips() {
-    tooltipsEnabled = !tooltipsEnabled;
-    if (tooltipsEnabled) {
-      d3.selectAll("circle")
-        .on("mouseover", tip.show)
-        .on("mouseout", tip.hide);
-    } else {
-      d3.selectAll("circle")
-        .on("mouseover", null)
-        .on("mouseover", null);
-    }
-    tooltipToggle.node().innerText = "Tooltips are " + (tooltipsEnabled ? 'enabled' : 'disabled');
-  }
+  // var tooltipsEnabled;
+
+  // var tooltipToggle = d3.select("#tooltip_toggle")
+  //   .on("click", toggleTooltips);
+
+  // function toggleTooltips() {
+  //   tooltipsEnabled = !tooltipsEnabled;
+  //   if (tooltipsEnabled) {
+  //     d3.selectAll("circle")
+  //       .on("mouseover", tip.show)
+  //       .on("mouseout", tip.hide);
+  //   } else {
+  //     d3.selectAll("circle")
+  //       .on("mouseover", null)
+  //       .on("mouseover", null);
+  //   }
+  //   tooltipToggle.node().innerText = "Tooltips are " + (tooltipsEnabled ? 'enabled' : 'disabled');
+  // }
 
 });
