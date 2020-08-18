@@ -223,6 +223,19 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
   const drawGraph = () => {// receives default "event" which has a "target" containing various attributes
     var clickedData = dataByCluster.filter(d => d.key === event.target.id)[0].values;
     console.log(clickedData)
+    // event.target.setAttribute("stroke-width", 2)
+    var idToChange = "#" + event.target.id
+    // first reset attrs to defaults as drawn
+    // figure out a way to reset this SHIT
+
+    // now change the selected id
+    centroids.select(idToChange)
+      .attr("stroke-width", 2)
+      .attr("fill-opacity", 1)
+    poly.select(idToChange)
+      .attr("stroke-width", 3)
+      .attr("fill-opacity", 0.7)
+
     // ------------------------------------------------------------------------------------------
     // Clicked Graph
     // ------------------------------------------------------------------------------------------
@@ -530,15 +543,16 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     hull = d3.polygonHull(points);
     // console.log(hull) // each hull is an array of [x, y] point pairs i.e. an array of two element arrays
     centroid = getPolygonCentroid(hull);
-    console.log(hull)
-    console.log(centroid)
-    console.log(d.key)
+    // console.log(hull)
+    // console.log(centroid)
+    // console.log(d.key)
     line = d3.line()
       .curve(d3.curveLinearClosed);
 
     poly.append("path")
       .attr("d", line(hull))
       .attr("stroke", color(d.key))
+      .attr("stroke-width", 1)
       .attr("fill", color(d.key))
       .attr("fill-opacity", 0.1)
       .attr("id", d.key)
@@ -554,6 +568,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
       .attr("r", 10)
       .attr("fill", color(d.key))
       .attr("stroke", "black")
+      .attr("stroke-width", 1)
       .attr("fill-opacity", 0.6)
       .on("mouseover", () => event.target.setAttribute('fill-opacity', 1))
       .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.6))
