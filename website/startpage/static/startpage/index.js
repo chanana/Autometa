@@ -226,14 +226,19 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     // event.target.setAttribute("stroke-width", 2)
     var idToChange = "#" + event.target.id
     // first reset attrs to defaults as drawn
-    // figure out a way to reset this SHIT
+    centroids.selectAll("circle")
+      .attr("stroke-width", 1)
+      .attr("fill-opacity", 0.4)
+    poly.selectAll("path")
+      .attr("stroke-width", 1)
+      .attr("fill-opacity", 0.1)
 
     // now change the selected id
     centroids.select(idToChange)
       .attr("stroke-width", 2)
       .attr("fill-opacity", 1)
     poly.select(idToChange)
-      .attr("stroke-width", 3)
+      .attr("stroke-width", 2)
       .attr("fill-opacity", 0.7)
 
     // ------------------------------------------------------------------------------------------
@@ -569,9 +574,9 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
       .attr("fill", color(d.key))
       .attr("stroke", "black")
       .attr("stroke-width", 1)
-      .attr("fill-opacity", 0.6)
+      .attr("fill-opacity", 0.4)
       .on("mouseover", () => event.target.setAttribute('fill-opacity', 1))
-      .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.6))
+      .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.4))
       .on("click", drawGraph)
 
     // https://observablehq.com/@d3/zoom-to-bounding-box Possible code to look at for
