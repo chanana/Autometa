@@ -530,6 +530,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     hull = d3.polygonHull(points);
     // console.log(hull) // each hull is an array of [x, y] point pairs i.e. an array of two element arrays
     centroid = getPolygonCentroid(hull);
+    console.log(hull)
     console.log(centroid)
     console.log(d.key)
     line = d3.line()
@@ -551,12 +552,11 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
       .attr("cx", centroid.x)
       .attr("cy", centroid.y)
       .attr("r", 10)
-      // .attr("fill", d => co  lor(d.key))
-      .attr("fill", "grey")
-      .attr("stroke", "blue")
-      .attr("fill-opacity", 0.1)
+      .attr("fill", color(d.key))
+      .attr("stroke", "black")
+      .attr("fill-opacity", 0.6)
       .on("mouseover", () => event.target.setAttribute('fill-opacity', 1))
-      .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.1))
+      .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.6))
       .on("click", drawGraph)
 
     // https://observablehq.com/@d3/zoom-to-bounding-box Possible code to look at for
