@@ -17,6 +17,10 @@
         {{object.date_uploaded|date:'F d, Y' }} is being plotted below.
     </h6>
     <div class="container">
+        <div class="row">
+            <div class="col-md-6 border" id="graphics_geometric_median"></div>
+            <div class="col-md-6 border" id="graphics_convex_hull"></div>
+        </div>
         <div class="row" id="drop_down_menus">
             <div class="col-md-2 text-center">
                 <b>Choose X Axis</b>
@@ -71,17 +75,14 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6 border" id="graphics_geometric_median"></div>
-            <div class="col-md-6 border" id="graphics_convex_hull"></div>
-        </div>
-        <div class="row">
 
             <div class="col-md-6 border" id="graphics_2d"></div>
             <div class="col-md-6 border" id="toggles_graphics_2d">
                 <b>Toggles</b><br>
-                <button id="zoom_toggle" class="btn btn-primary">Toggle zoom</button><br>
-                <button id="zoom_reset" class="btn btn-primary">Reset zoom</button><br>
+                <button id="zoom_toggle" class="btn btn-primary">Toggle zoom</button>
+                <button id="zoom_reset" class="btn btn-primary">Reset zoom</button>
                 <button id="tooltip_toggle" class="btn btn-primary">Tooltips are disabled</button>
+                <button id="table_toggle" class="btn btn-primary">Make table</button>
             </div>
         </div>
     </div>

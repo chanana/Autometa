@@ -356,7 +356,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
       .attr("cy", d => y(d[getChosenYAxis().value]))
       .attr("r", d => radius(d[getChosenRadius()]))
       .attr("fill", d => color(d[getChosenCircleColor()]))
-      .attr("opacity", ".5")
+      .attr("fill-opacity", ".5")
 
     // update x axis
     function updateX() {
