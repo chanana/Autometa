@@ -219,9 +219,9 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     return { x: x / f, y: y / f };
   }
 
-
+  var clickedData; // make it accessible to other functions
   const drawGraph = () => {// receives default "event" which has a "target" containing various attributes
-    var clickedData = dataByCluster.filter(d => d.key === event.target.id)[0].values;
+    clickedData = dataByCluster.filter(d => d.key === event.target.id)[0].values;
     console.log(clickedData)
     // event.target.setAttribute("stroke-width", 2)
     var idToChange = "#" + event.target.id
@@ -591,6 +591,20 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
       text: e.options[e.selectedIndex].text
     };
   }
+
+  const makeTable = function () {
+    var tabledata = clickedData;
+    //create Tabulator on DOM element with id "table_selected_data"
+    var table = new Tabulator("#table_selected_data", {
+      height: 500, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+      data: tabledata, //assign data to table
+      layout: "fitDataFill",
+      autoColumns: true,
+    });
+    table.updateColumnDefinition("cluster", { editor: true })
+  }
+
+  d3.select("#table_toggle").on("click", makeTable);
 
 
   // // ------------------------------------------------------------------------------------------
