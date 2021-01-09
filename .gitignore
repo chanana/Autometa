@@ -2,7 +2,7 @@
 autometaDashboard.gif
 autometaDashboard.pdf
 d3/
-
+.idea/
 
 ## Taken from: https://github.com/github/gitignore/blob/master/Node.gitignore
 #Logs
