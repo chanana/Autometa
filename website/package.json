@@ -1,0 +1,16 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "### 1. Clone the project ```bash git clone git@github.com:KwanLab/Autometa.git cd Autometa ```",
+  "main": "index.js",
+  "scripts": {
+    "start": "node startpage/static/startpage/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "d3": "^6.2.0"
+  }
+}

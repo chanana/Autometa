@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'startpage/scatter.css' %}" charset="utf-8">
-    <link href="https://unpkg.com/tabulator-tables@4.7.2/dist/css/tabulator.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -84,6 +84,12 @@
                 <button id="zoom_reset" class="btn btn-primary">Reset zoom</button>
                 <button id="tooltip_toggle" class="btn btn-primary">Tooltips are disabled</button>
                 <button id="table_toggle" class="btn btn-primary">Make table</button>
+                <button id="table_save" class="btn btn-success">Save changes</button>
+                <button id="table_history_undo" class="btn btn-secondary">Undo Edit</button>
+                <button id="table_history_redo" class="btn btn-secondary">Redo Edit</button>
+                <button id="table_write_to_disk" class="btn btn-warning">Write Changes</button>
+                <button id="print" class="btn btn-secondary">Print The Thing</button>
+                {% comment %}href="{% url 'table-write-to-disk' object.id %}"{% endcomment %}
             </div>
         </div>
         <div class="row">
@@ -94,7 +100,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"></script>
     <script id="tsvFile" src="{% static 'startpage/index.js' %}" charset="utf-8" tsvFile="{{object.file.url}}"></script>
-    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.7.2/dist/js/tabulator.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
 
 </body>
 

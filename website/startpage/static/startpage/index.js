@@ -1,9 +1,9 @@
 const tsvFile = d3.select("#tsvFile").attr("tsvFile");
-var chartBox = document.querySelector("#graphics_2d");
+const chartBox = document.querySelector("#graphics_2d");
 
 const chartBoxWidth = chartBox.getBoundingClientRect().width;
 
-var margin = {
+const margin = {
   top: 0.1 * chartBoxWidth,
   right: 0.1 * chartBoxWidth,
   bottom: 0.1 * chartBoxWidth,
@@ -57,18 +57,18 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
   // convex hull code
   // ----------------------------------------------------------------------------------------
   // setup axes
-  var xHull = d3.scaleLinear()
+  const xHull = d3.scaleLinear()
     .domain(d3.extent(data, d => d.x))
     .range([0, width])
     .nice();
 
-  var yHull = d3.scaleLinear()
+  const yHull = d3.scaleLinear()
     .domain(d3.extent(data, d => d.y))
     .range([height, 0])
     .nice();
 
   // color
-  var color = d3.scaleOrdinal()
+  const color = d3.scaleOrdinal()
     .range(d3.schemeTableau10);
 
   // //zoom stuff
@@ -78,11 +78,11 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
   //   .on("zoom", zoomFunctionHull);
 
   // init x axis
-  var xHullAxis = d3.axisBottom(xHull);
-  var yHullAxis = d3.axisLeft(yHull);
+  const xHullAxis = d3.axisBottom(xHull);
+  const yHullAxis = d3.axisLeft(yHull);
 
   // draw svg box
-  var svgHull = d3.select("#graphics_convex_hull")
+  const svgHull = d3.select("#graphics_convex_hull")
     .append("svg")
     .attr("width", chartBoxWidth)
     .attr("height", chartBoxWidth)
@@ -95,10 +95,10 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     .attr("width", width)
     .attr("height", height);
 
-  var gxHullAxis = svgHull.append("g")
+  const gxHullAxis = svgHull.append("g")
     .attr("class", "axisHull axis--x")
     .attr("transform", `translate(0, ${height})`)
-    .call(xHullAxis)
+    .call(xHullAxis);
 
   svgHull.append("text")
     .attr("class", "label--x")
@@ -107,7 +107,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     .attr("fill", "#000")
     .text("BH-tSNE X");
 
-  var gyHullAxis = svgHull.append("g")
+  const gyHullAxis = svgHull.append("g")
     .attr("class", "axisHull axis--y")
     .call(yHullAxis);
 
@@ -118,7 +118,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     .attr('fill', '#000')
     .text("BH-tSNE Y");
 
-  var poly = svgHull.append('svg')
+  const poly = svgHull.append('svg')
     .attr("class", "poly")
     .attr("width", width)
     .attr("height", height);
@@ -127,12 +127,12 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
   // geometric median code
   // ----------------------------------------------------------------------------------------
   // setup axes
-  var xGM = d3.scaleLinear()
+  const xGM = d3.scaleLinear()
     .domain(d3.extent(data, d => d.x))
     .range([0, width])
     .nice();
 
-  var yGM = d3.scaleLinear()
+  const yGM = d3.scaleLinear()
     .domain(d3.extent(data, d => d.y))
     .range([height, 0])
     .nice();
@@ -144,11 +144,11 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
   //   .on("zoom", zoomFunctionGeometricMedian);
 
   // init x axis
-  var xGMAxis = d3.axisBottom(xGM);
-  var yGMAxis = d3.axisLeft(yGM);
+  const xGMAxis = d3.axisBottom(xGM);
+  const yGMAxis = d3.axisLeft(yGM);
 
   // draw svg box
-  var svgGM = d3.select("#graphics_geometric_median")
+  const svgGM = d3.select("#graphics_geometric_median")
     .append("svg")
     .attr("width", chartBoxWidth)
     .attr("height", chartBoxWidth)
@@ -161,10 +161,10 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     .attr("width", width)
     .attr("height", height);
 
-  var gxGMAxis = svgGM.append("g")
+  const gxGMAxis = svgGM.append("g")
     .attr("class", "axisGM axis--x")
     .attr("transform", `translate(0, ${height})`)
-    .call(xGMAxis)
+    .call(xGMAxis);
 
   svgGM.append("text")
     .attr("class", "label--x")
@@ -173,7 +173,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     .attr("fill", "#000")
     .text("BH-tSNE X");
 
-  var gyGMAxis = svgGM.append("g")
+  const gyGMAxis = svgGM.append("g")
     .attr("class", "axisGM axis--y")
     .call(yGMAxis);
 
@@ -184,7 +184,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     .attr('fill', '#000')
     .text("BH-tSNE Y");
 
-  var centroids = svgGM.append('svg')
+  const centroids = svgGM.append('svg')
     .attr("class", "centroids")
     .attr("width", width)
     .attr("height", height);
@@ -195,27 +195,28 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
 
   var points, hull, line;
 
-  var dataByCluster = d3.nest().key(d => d.cluster).entries(data)
+  const dataByCluster = d3.nest().key(d => d.cluster).entries(data);
   // dataByCluster is an array of objects each containing property "key" with the
   // cluster and a "values" which is an array of (objects) rows from that cluster 
 
   // function to calculate the centroid given an array of pionts
   // https://stackoverflow.com/a/9939071
   function getPolygonCentroid(pts) {
-    var first = pts[0], last = pts[pts.length - 1];
-    if (first[0] != last[0] || first[1] != last[1]) pts.push(first);
-    var twicearea = 0,
+    const first = pts[0], last = pts[pts.length - 1];
+    if (first[0] !== last[0] || first[1] !== last[1]) pts.push(first);
+    let twiceArea = 0,
       x = 0, y = 0,
       nPts = pts.length,
       p1, p2, f;
-    for (var i = 0, j = nPts - 1; i < nPts; j = i++) {
-      p1 = pts[i]; p2 = pts[j];
+    for (let i = 0, j = nPts - 1; i < nPts; j = i++) {
+      p1 = pts[i];
+      p2 = pts[j];
       f = p1[0] * p2[1] - p2[0] * p1[1];
-      twicearea += f;
+      twiceArea += f;
       x += (p1[0] + p2[0]) * f;
       y += (p1[1] + p2[1]) * f;
     }
-    f = twicearea * 3;
+    f = twiceArea * 3;
     return { x: x / f, y: y / f };
   }
 
@@ -292,7 +293,9 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     // init tooltips on hover
     var tip = d3.tip()
       .attr('class', 'd3-tip')
-      .html(function (d) { return "contig: " + d['contig'] });
+      .html(function (d) {
+        return "contig: " + d['contig']
+      });
     // .html(function (d) { return "Contig: " + d['contig'] + "<br>Cluster: " + d['cluster'] });
 
     //zoom stuff
@@ -332,7 +335,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
       .attr("fill", "#000")
       .text(getChosenXAxis().text);
 
-    var gyAxis = svg.append("g")
+    const gyAxis = svg.append("g")
       .attr("class", "axis axis--y")
       .call(yAxis);
 
@@ -343,7 +346,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
       .attr('fill', '#000')
       .text(getChosenYAxis().text);
 
-    var scatter = svg.append('svg')
+    const scatter = svg.append('svg')
       .attr("class", "scatter")
       .attr("width", width)
       .attr("height", height);
@@ -438,6 +441,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
         .transition()
         .attr("fill", d => color(d[getChosenCircleColor()]));
     }
+
     d3.select("#choices_graphics_2d_circle_color").on("change", updateColors);
 
     // update circle radius on change
@@ -460,6 +464,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
         .duration(750)
         .attr("r", d => radius(d[getChosenRadius()]));
     }
+
     d3.select("#choices_graphics_2d_circle_radius").on("change", updateRadius);
 
     function zoomFunction() {
@@ -501,6 +506,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     // https://observablehq.com/@d3/programmatic-zoom
     // https://github.com/d3/d3-zoom/issues/107
     d3.select("#zoom_reset").on("click", resetZoom);
+
     function resetZoom() {
       d3.select(".zoomOnThisElement")
         .transition()
@@ -511,6 +517,7 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     var tooltipsEnabled;
     var tooltipToggle = d3.select("#tooltip_toggle")
       .on("click", toggleTooltips);
+
     function toggleTooltips() {
       tooltipsEnabled = !tooltipsEnabled;
       if (tooltipsEnabled) {
@@ -527,62 +534,65 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
 
   }
 
-  dataByCluster.forEach(d => {
+  const visualize = function () {
+    dataByCluster.forEach(d => {
 
-    // creates a list of clusters; currently unused.
-    // TODO: either remove this or use it in some way. 
-    d3.select("#cluster-selection")
-      .append("option")
-      .text(d.key)
-      .attr("value", d.key)
+      // creates a list of clusters; currently unused.
+      // TODO: either remove this or use it in some way. 
+      d3.select("#cluster-selection")
+        .append("option")
+        .text(d.key)
+        .attr("value", d.key)
 
-    if (d.key === "") {
-      return
-    }
-    if (d.values.length < 3) { // convex hull for less than three points doesn't exist  
-      return
-    }
+      if (d.key === "") {
+        return
+      }
+      if (d.values.length < 3) { // convex hull for less than three points doesn't exist  
+        return
+      }
 
-    // each d contains a key (binXXXX) and values (array of objects)
-    points = d.values.map(d => [xHull(d.x), yHull(d.y)]);
-    hull = d3.polygonHull(points);
-    // console.log(hull) // each hull is an array of [x, y] point pairs i.e. an array of two element arrays
-    centroid = getPolygonCentroid(hull);
-    // console.log(hull)
-    // console.log(centroid)
-    // console.log(d.key)
-    line = d3.line()
-      .curve(d3.curveLinearClosed);
+      // each d contains a key (binXXXX) and values (array of objects)
+      points = d.values.map(d => [xHull(d.x), yHull(d.y)]);
+      hull = d3.polygonHull(points);
+      // console.log(hull) // each hull is an array of [x, y] point pairs i.e. an array of two element arrays
+      centroid = getPolygonCentroid(hull);
+      // console.log(hull)
+      // console.log(centroid)
+      // console.log(d.key)
+      line = d3.line()
+        .curve(d3.curveLinearClosed);
 
-    poly.append("path")
-      .attr("d", line(hull))
-      .attr("stroke", color(d.key))
-      .attr("stroke-width", 1)
-      .attr("fill", color(d.key))
-      .attr("fill-opacity", 0.1)
-      .attr("id", d.key)
-      .on("mouseover", () => event.target.setAttribute('fill-opacity', 0.7))
-      .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.1))
-      .on("click", drawGraph)
+      poly.append("path")
+        .attr("d", line(hull))
+        .attr("stroke", color(d.key))
+        .attr("stroke-width", 1)
+        .attr("fill", color(d.key))
+        .attr("fill-opacity", 0.1)
+        .attr("id", d.key)
+        .on("mouseover", () => event.target.setAttribute('fill-opacity', 0.7))
+        .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.1))
+        .on("click", drawGraph)
 
-    centroids.append("circle")
-      .attr("class", "dot")
-      .attr("id", d.key)
-      .attr("cx", centroid.x)
-      .attr("cy", centroid.y)
-      .attr("r", 10)
-      .attr("fill", color(d.key))
-      .attr("stroke", "black")
-      .attr("stroke-width", 1)
-      .attr("fill-opacity", 0.4)
-      .on("mouseover", () => event.target.setAttribute('fill-opacity', 1))
-      .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.4))
-      .on("click", drawGraph)
+      centroids.append("circle")
+        .attr("class", "dot")
+        .attr("id", d.key)
+        .attr("cx", centroid.x)
+        .attr("cy", centroid.y)
+        .attr("r", 10)
+        .attr("fill", color(d.key))
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("fill-opacity", 0.4)
+        .on("mouseover", () => event.target.setAttribute('fill-opacity', 1))
+        .on("mouseout", () => event.target.setAttribute('fill-opacity', 0.4))
+        .on("click", drawGraph)
 
-    // https://observablehq.com/@d3/zoom-to-bounding-box Possible code to look at for
-    // bounding box based zoom i.e. click on a path and it'll zoom to that path in focus
-    // and center of screen
-  });
+      // https://observablehq.com/@d3/zoom-to-bounding-box Possible code to look at for
+      // bounding box based zoom i.e. click on a path and it'll zoom to that path in focus
+      // and center of screen
+    });
+  }
+  visualize();
 
   const getChosenCluster = function () {
     let e = document.getElementById("cluster-selection");
@@ -592,20 +602,97 @@ d3.tsv(tsvFile, row => {// receives a row, its index and an array of column keys
     };
   }
 
+  var table;
+
   const makeTable = function () {
     var tabledata = clickedData;
     //create Tabulator on DOM element with id "table_selected_data"
-    var table = new Tabulator("#table_selected_data", {
+    table = new Tabulator("#table_selected_data", {
       height: 500, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
       data: tabledata, //assign data to table
       layout: "fitDataFill",
-      autoColumns: true,
+      validationMode: "highlight",
+      history: true,
+      columns: [
+        { title: "X", field: "x", sorter: "number" },
+        { title: "Y", field: "y", sorter: "number" },
+        { title: "Cluster", field: "cluster", sorter: "string" },
+        {
+          title: "User Defined Cluster",
+          field: "user_defined_cluster",
+          sorter: "string",
+          editor: "input",
+          validator: "regex:bin_[0-9]+$"
+        },
+        { title: "GC", field: "GC", sorter: "number" },
+        { title: "Contig", field: "contig", sorter: "string" },
+        { title: "Contig Length", field: "contig_length", sorter: "number" },
+        { title: "Completeness", field: "completeness", sorter: "number" },
+        { title: "Coverage", field: "coverage", sorter: "number" },
+        { title: "Purity", field: "purity", sorter: "number" },
+        { title: "Taxid", field: "taxid", sorter: "string" },
+        { title: "Superkingdom", field: "superkingdom", sorter: "string" },
+        { title: "Phylum", field: "phylum", sorter: "string" },
+        { title: "Class", field: "class", sorter: "string" },
+        { title: "Order", field: "order", sorter: "string" },
+        { title: "Family", field: "family", sorter: "string" },
+        { title: "Genus", field: "genus", sorter: "string" },
+        { title: "Species", field: "species", sorter: "string" },
+      ],
     });
-    table.updateColumnDefinition("cluster", { editor: true })
+    // d3.select("#table_history_undo").on("click", table.undo())
+    // d3.select("#table_history_redo").on("click", table.redo())
+  }
+
+  const saveTable = function () {
+    table.selectRow()
+    var selectedData = table.getSelectedData();
+    table.deselectRow() // un-highlights the selected rows
+    // console.log(selectedData)
+    // next, compare the 'cluster' and 'user_defined_cluster' fields to find
+    // out which rows were changed from the original data
+    var dataToBeUpdated = [];
+    selectedData.forEach(element => {
+      // console.log(element.contig)
+      if (element.cluster != element.user_defined_cluster) {
+        dataToBeUpdated.push(element)
+      }
+    });
+    // console.log("Saved!")
+    return dataToBeUpdated;
+  }
+
+  const writeTableToDisk = function () {
+    var dataToBeUpdated = saveTable()
+    // console.log("dataToBeUpdated", dataToBeUpdated)
+    // ud is an element from the dataToBeupdated Array
+    // index_ud is the index of that element
+    dataToBeUpdated.forEach((ud, index_ud) => {
+      // values is an Array of objects but it contains just one object. It might
+      // contain more in the future so will have to change implementation then. Now, we just take the first object and get its values to store in a new Array of objects.
+      var bin_to_modify = dataByCluster.filter(clust => clust.key == ud.cluster);
+      var row_to_modify = bin_to_modify[0].values.filter(element =>
+        element.contig == ud.contig
+      );
+      row_to_modify[0].cluster = ud.user_defined_cluster;
+      console.log("row_to_modify", row_to_modify);
+      console.log("bin_to_modify", bin_to_modify);
+    });
+  }
+
+  const print_the_thing = function () {
+    // visualize();
+    console.log(dataByCluster);
+    array_for_tsv = [];
+    dataByCluster.forEach(obj => array_for_tsv.push(obj.values));
+    array_for_tsv = array_for_tsv.flat();
+    console.log(array_for_tsv); // gives us back a big flat tsv-able file.
   }
 
   d3.select("#table_toggle").on("click", makeTable);
-
+  d3.select("#table_save").on("click", saveTable);
+  d3.select("#table_write_to_disk").on("click", writeTableToDisk)
+  d3.select("#print").on("click", print_the_thing);
 
   // // ------------------------------------------------------------------------------------------
   // // Clicked Graph

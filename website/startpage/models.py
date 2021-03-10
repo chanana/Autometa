@@ -9,8 +9,9 @@ class Uploads(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=128)
     description = models.TextField(
-        default='A file needs a description.', blank=True)
-    file = models.FileField(upload_to='uploads/')
+        default="A file needs a description.", blank=True
+    )
+    file = models.FileField(upload_to="uploads/")
     date_uploaded = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -76,8 +77,9 @@ class Pangenome(models.Model):
     purity = models.FloatField()
     heterogeneity = models.FloatField()
     taxon = models.TextField()
-    mag = models.ForeignKey(MetagenomeAssembledGenome,
-                            on_delete=models.CASCADE)
+    mag = models.ForeignKey(
+        MetagenomeAssembledGenome, on_delete=models.CASCADE
+    )
     metagenome = models.ForeignKey(Metagenome, on_delete=models.CASCADE)
 
 
@@ -87,21 +89,20 @@ class Job(models.Model):
     description = models.TextField(default="a job needs a description")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    # TODO: not sure if this is a file field or something else. Add the location of config file here (i think)
-    # config_file = models.FileField
+    # TODO: not sure if this is a file field or something else. Add the
+    # location of config file here (i think) config_file = models.FileField
 
-    # choice for type of job: class implementation allows for easier extensibility
+    # choice for type of job: class implementation allows for easier
+    # extensibility
     class TypeOfJob(models.TextChoices):
-        BINNING = 'BN', _('Binning')
-        PANGENOME = 'PG', _('Pangenome')
+        BINNING = "BN", _("Binning")
+        PANGENOME = "PG", _("Pangenome")
 
     # to get the human-readable version in html, use get_FOO_display where FOO
     # is the field name. In this case, FOO is 'type_of_job'
     # https://docs.djangoproject.com/en/3.0/ref/models/instances/#extra-instance-methods
     type_of_job = models.CharField(
-        max_length=2,
-        choices=TypeOfJob.choices,
-        default=TypeOfJob.BINNING
+        max_length=2, choices=TypeOfJob.choices, default=TypeOfJob.BINNING
     )
 
     def __str__(self):
@@ -111,19 +112,18 @@ class Job(models.Model):
         # We want to take our user to the job-detail page once they've created
         # their new job. Since the job-detail page url is job/<pk>, we need to
         # specify that we get that back as a string in kwargs.
-        return reverse('job-detail', kwargs={'pk': self.pk})
+        return reverse("job-detail", kwargs={"pk": self.pk})
 
 
-# class NewJob(models.Model):
-#     title = models.CharField(max_length=127)
-#     date_run = models.DateTimeField(default=timezone.now)
-#     description = models.TextField(default="a job needs a description")
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     # [files]
-#     # metagenome = metagenome.fna
-#     metagenome = models.FileField(upload_to='uploads/job_input/metagenomes/')
-#     # # Multiple Reads files of respective format may be provided using a comma-delimiter
-#     # TODO: Ask evan which fields are required. also ask about the fields at the bottom that don't have fields setup yet.
+# class NewJob(models.Model): title = models.CharField(max_length=127) date_run
+#     = models.DateTimeField(default=timezone.now) description =
+#     models.TextField(default="a job needs a description") user =
+#     models.ForeignKey(User, on_delete=models.CASCADE) # [files] # metagenome
+#     = metagenome.fna metagenome =
+#     models.FileField(upload_to='uploads/job_input/metagenomes/') Multiple
+#     Reads files of respective format may be provided using a comma-delimiter
+#     TODO: Ask evan which fields are required. also ask about the fields at
+#     the bottom that don't have fields setup yet.
 
 #     AT LEAST ONE
 #     # fwd_reads = fwd_reads.fastq, fwd_reads.fastq
@@ -193,7 +193,8 @@ class Job(models.Model):
 #     # project = 1
 #     # metagenome_num = 0
 
-#     # kingdom = bacteria # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1691724/pdf/15306349.pdf
+#     # kingdom = bacteria
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1691724/pdf/15306349.pdf
 
 #     KINGDOM_CHOICES = [
 #         ('BCT', 'Bacteria'),
